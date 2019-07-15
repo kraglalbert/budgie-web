@@ -13,7 +13,7 @@ def index():
 @main.route("/users")
 def users():
     users = User.query.all()
-    return jsonify(User.serialize_user_list(users))
+    return jsonify(User.serialize_list(users))
 
 
 # get all transcations

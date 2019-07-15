@@ -1,4 +1,5 @@
 import os
+from env_vars import env_vars
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -15,8 +16,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = (
-        os.environ.get("DEV_DATABASE_URL")
-        or "postgres://tkinmnliqtzyaj:74902b4644ad86841766717d3091192cede0dd309d2332fc632d954ea75a4f24@ec2-107-20-173-2.compute-1.amazonaws.com:5432/d4rjvglbrqeth8"
+        os.environ.get("DEV_DATABASE_URL") or env_vars["DEV_DATABASE_URL"]
     )
 
 

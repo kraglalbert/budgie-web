@@ -39,7 +39,7 @@ class User(db.Model):
         }
 
     @staticmethod
-    def serialize_user_list(users):
+    def serialize_list(users):
         json_users = []
         for user in users:
             json_users.append(user.serialize)
