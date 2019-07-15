@@ -1,3 +1,4 @@
+import json
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -34,7 +35,7 @@ class User(db.Model):
             "id": self.id,
             "name": self.name,
             "password_hash": self.password_hash,
-            "transactions": self.transactions,
+            "transactions": Transaction.serialize_list(self.transactions),
             "username": self.username,
         }
 
@@ -54,10 +55,28 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64), unique=False, nullable=False)
     source = db.Column(db.String(64))
-    is_profit = db.Column(db.Boolean, nullable=False)
-    amount = db.Column(db.Float, nullable=False)
+    amount = db.Column(db.Numeric(precision=2), nullable=False)
     date = db.Column(db.Date, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    @property
+    def serialize(self):
+        """Return object data in serializeable format"""
+        return {
+            "id": self.id,
+            "title": self.title,
+            "source": self.source,
+            "amount": json.dumps(float(self.amount)),
+            "date": self.date,
+            "user_id": self.user_id,
+        }
+
+    @staticmethod
+    def serialize_list(transactions):
+        json_transactions = []
+        for t in transactions:
+            json_transactions.append(t.serialize)
+        return json_transactions
 
     def __repr__(self):
         return "<Transaction %r>" % self.title
