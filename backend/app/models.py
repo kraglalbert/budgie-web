@@ -55,7 +55,7 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64), unique=False, nullable=False)
     source = db.Column(db.String(64))
-    amount = db.Column(db.Numeric(precision=2), nullable=False)
+    amount = db.Column(db.Numeric(scale=2, decimal_return_scale=2), nullable=False)
     date = db.Column(db.Date, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
