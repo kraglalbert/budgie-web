@@ -1,5 +1,5 @@
 import datetime
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort, make_response
 from . import main
 from .. import db
 from app.models import User, Transaction
@@ -43,14 +43,26 @@ def transactions():
 
 
 # get all transactions for user
-@main.route("/transactions/<user_id>", methods=["GET"])
+@main.route("/transactions/<int:user_id>", methods=["GET"])
 def transactions_for_user(user_id):
     transactions = Transaction.query.filter_by(user_id=user_id).all()
     return jsonify(Transaction.serialize_list(transactions))
 
 
+# get all transactions for user for specified month and year
+@main.route("/transactions/<int:user_id>/<int:year>/<int:month>", methods=["GET"])
+def transactions_for_user_month(user_id, year, month):
+    transactions = Transaction.query.filter_by(user_id=user_id).all()
+    result = []
+    for t in transactions:
+        date = t.date
+        if date.year == year and date.month == month:
+            result.append(t)
+    return jsonify(Transaction.serialize_list(result))
+
+
 # get a transaction by ID
-@main.route("/transaction/<id>", methods=["GET"])
+@main.route("/transaction/<int:id>", methods=["GET"])
 def get_transaction(id):
     t = Transaction.query.filter_by(id=id).first()
     if t == None:
@@ -85,10 +97,9 @@ def create_transaction():
 
 
 # update a transaction by ID
-@main.route("/transaction/update", methods=["PUT"])
-def update_transaction():
+@main.route("/transaction/update/<int:id>", methods=["PUT"])
+def update_transaction(id):
     data = request.get_json(force=True)
-    id = data.get("id")
     title = data.get("title")
     source = data.get("source")
     amount = data.get("amount")
@@ -112,10 +123,9 @@ def update_transaction():
 
 
 # delete a transaction by ID
-@main.route("/transaction/delete", methods=["DELETE"])
-def delete_transaction():
+@main.route("/transaction/delete/<int:id>", methods=["DELETE"])
+def delete_transaction(id):
     data = request.get_json(force=True)
-    id = data.get("id")
     t = Transaction.query.filter_by(id=id).first()
 
     db.session.delete(t)
