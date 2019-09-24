@@ -9,6 +9,7 @@ class User(db.Model):
     name = db.Column(db.String(64), nullable=False)
     username = db.Column(db.String(64), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
+    monthly_budget = db.Column(db.Numeric(scale=2, decimal_return_scale=2))
     transactions = db.relationship("Transaction", backref="users", lazy=True)
 
     @property
@@ -35,6 +36,7 @@ class User(db.Model):
             "id": self.id,
             "name": self.name,
             "password_hash": self.password_hash,
+            "monthly_budget": json.dumps(float(self.monthly_budget)),
             "transactions": Transaction.serialize_list(self.transactions),
             "username": self.username,
         }

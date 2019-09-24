@@ -135,8 +135,8 @@ def delete_transaction(id):
 
 @main.errorhandler(404)
 def page_not_found(e):
-    return "404 - Page not found!"
+    return "404 - Page not found!", 404
 
 @main.errorhandler(500)
 def internal_server_error(e):
-    return "500 - Internal server error!"
+    return "500 - Internal server error!", 500
