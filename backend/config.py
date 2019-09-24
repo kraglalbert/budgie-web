@@ -2,7 +2,7 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-
+print(os.environ.get("TEST_DATABASE_URL"))
 class Config:
     APP_NAME = "Budgie"
     SECRET_KEY = os.environ.get("SECRET_KEY") or "hard to guess string"
