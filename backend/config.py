@@ -1,5 +1,4 @@
 import os
-from env_vars import env_vars
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -17,20 +16,20 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = (
-        os.environ.get("DEV_DATABASE_URL") or env_vars["DEV_DATABASE_URL"]
+        os.environ.get("DEV_DATABASE_URL")
     )
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = (
-        os.environ.get("TEST_DATABASE_URL") or env_vars["TEST_DATABASE_URL"]
+        os.environ.get("TEST_DATABASE_URL")
     )
 
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = (
-        os.environ.get("PROD_DATABASE_URL") or env_vars["PROD_DATABASE_URL"]
+        os.environ.get("PROD_DATABASE_URL")
     )
 
 
