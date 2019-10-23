@@ -11,6 +11,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(128))
     monthly_budget = db.Column(db.Numeric(scale=2, decimal_return_scale=2))
     transactions = db.relationship("Transaction", backref="users", lazy=True)
+    transactions_months = db.relationship("TransactionMonth", backref="users", lazy=True)
 
     @property
     def password(self):
@@ -36,7 +37,7 @@ class User(db.Model):
             "id": self.id,
             "name": self.name,
             "password_hash": self.password_hash,
-            "monthly_budget": json.dumps(float(self.monthly_budget)),
+            "monthly_budget": json.dumps(float(self.monthly_budget)) if self.monthly_budget is not None else 0,
             "transactions": Transaction.serialize_list(self.transactions),
             "username": self.username,
         }
@@ -60,6 +61,7 @@ class Transaction(db.Model):
     amount = db.Column(db.Numeric(scale=2, decimal_return_scale=2), nullable=False)
     date = db.Column(db.Date, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    transaction_month_id = db.Column(db.Integer, db.ForeignKey("transaction_months.id"), nullable=False)
 
     @property
     def serialize(self):
@@ -71,6 +73,7 @@ class Transaction(db.Model):
             "amount": json.dumps(float(self.amount)),
             "date": self.date,
             "user_id": self.user_id,
+            "transaction_month_id": self.transaction_month_id
         }
 
     @staticmethod
@@ -82,3 +85,29 @@ class Transaction(db.Model):
 
     def __repr__(self):
         return "<Transaction %r>" % self.title
+
+class TransactionMonth(db.Model):
+    __tablename__ = "transaction_months"
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    transactions = db.relationship("Transaction", backref="transaction_months", lazy=True)
+
+    @property
+    def serialize(self):
+        """Return object data in serializeable format"""
+        return {
+            "id": self.id,
+            "date": self.date,
+            "transactions": self.transactions,
+        }
+
+    @staticmethod
+    def serialize_list(transaction_months):
+        json_transactions_months = []
+        for tm in transactions_months:
+            json_transactions_months.append(tm.serialize)
+        return json_transactions_months
+
+    def __repr__(self):
+        return "<TransactionMonth %r>" % self.title

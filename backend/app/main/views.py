@@ -2,7 +2,7 @@ import datetime
 from flask import Flask, jsonify, request, abort, make_response
 from . import main
 from .. import db
-from app.models import User, Transaction
+from app.models import User, Transaction, TransactionMonth
 
 
 # get all users
@@ -13,7 +13,7 @@ def users():
 
 
 # get user by username
-@main.route("/user/<username>", methods=["GET"])
+@main.route("/users/<username>", methods=["GET"])
 def get_user_by_username(username):
     user = User.query.filter_by(username=username).first()
     if user == None:
@@ -52,17 +52,15 @@ def transactions_for_user(user_id):
 # get all transactions for user for specified month and year
 @main.route("/transactions/<int:user_id>/<int:year>/<int:month>", methods=["GET"])
 def transactions_for_user_month(user_id, year, month):
-    transactions = Transaction.query.filter_by(user_id=user_id).all()
-    result = []
-    for t in transactions:
-        date = t.date
-        if date.year == year and date.month == month:
-            result.append(t)
-    return jsonify(Transaction.serialize_list(result))
+    t_month = TransactionMonth.query.filter_by(date=datetime.datetime(int(year), int(month), 1), user_id=user_id).first()
+    if t_month is None:
+        return make_response(jsonify(message='Transaction month does not exist for specified user'), 400)
+    transactions = t_month.transactions
+    return jsonify(Transaction.serialize_list(transactions))
 
 
 # get a transaction by ID
-@main.route("/transaction/<int:id>", methods=["GET"])
+@main.route("/transactions/<int:id>", methods=["GET"])
 def get_transaction(id):
     t = Transaction.query.filter_by(id=id).first()
     if t == None:
@@ -71,7 +69,7 @@ def get_transaction(id):
 
 
 # create new transaction
-@main.route("/transaction/create", methods=["POST"])
+@main.route("/transactions/create", methods=["POST"])
 def create_transaction():
     data = request.get_json(force=True)
     title = data.get("title")
@@ -86,9 +84,16 @@ def create_transaction():
     date = datetime.datetime(int(year), int(month), int(day))
 
     user = User.query.filter_by(username=username).first()
+    # check if transaction month exists
+    t_month = TransactionMonth.query.filter_by(date=datetime.datetime(int(year), int(month), 1), user_id=user.id).first()
+    if t_month is None:
+        # create transaction month object if it doesn't exist
+        t_month = TransactionMonth(date=datetime.datetime(int(year), int(month), 1), user_id=user.id)
+        db.session.add(t_month)
+        db.session.commit()
 
     new_transaction = Transaction(
-        title=title, source=source, amount=amount, user_id=user.id, date=date
+        title=title, source=source, amount=amount, user_id=user.id, date=date, transaction_month_id=t_month.id
     )
     db.session.add(new_transaction)
     db.session.commit()
@@ -97,7 +102,7 @@ def create_transaction():
 
 
 # update a transaction by ID
-@main.route("/transaction/update/<int:id>", methods=["PUT"])
+@main.route("/transactions/update/<int:id>", methods=["PUT"])
 def update_transaction(id):
     data = request.get_json(force=True)
     title = data.get("title")
@@ -123,7 +128,7 @@ def update_transaction(id):
 
 
 # delete a transaction by ID
-@main.route("/transaction/delete/<int:id>", methods=["DELETE"])
+@main.route("/transactions/delete/<int:id>", methods=["DELETE"])
 def delete_transaction(id):
     data = request.get_json(force=True)
     t = Transaction.query.filter_by(id=id).first()
