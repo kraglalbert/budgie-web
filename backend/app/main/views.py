@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal, ROUND_DOWN
 from flask import Flask, jsonify, request, abort, make_response
 from . import main
 from .. import db
@@ -33,6 +34,24 @@ def create_user():
     db.session.add(new_user)
     db.session.commit()
     return jsonify(new_user.serialize)
+
+
+# set a user's monthly budgert
+@main.route("/users/<int:user_id>/set-budget", methods=["PUT"])
+def update_user_budget(user_id):
+    data = request.get_json(force=True)
+    monthly_budget_raw = data.get("monthly_budget")
+    monthly_budget = Decimal(str(monthly_budget_raw)).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+
+    user = User.query.filter_by(id=user_id).first()
+    if user == None:
+        abort(404)
+
+    user.monthly_budget = monthly_budget
+
+    db.session.add(user)
+    db.session.commit()
+    return jsonify(user.serialize)
 
 
 # get all transactions
@@ -74,7 +93,8 @@ def create_transaction():
     data = request.get_json(force=True)
     title = data.get("title")
     source = data.get("source")
-    amount = data.get("amount")
+    amount_raw = data.get("amount")
+    amount = Decimal(str(amount_raw)).quantize(Decimal('.01'), rounding=ROUND_DOWN)
     username = data.get("username")
 
     year = data.get("year")
@@ -107,7 +127,8 @@ def update_transaction(id):
     data = request.get_json(force=True)
     title = data.get("title")
     source = data.get("source")
-    amount = data.get("amount")
+    amount_raw = data.get("amount")
+    amount = Decimal(str(amount_raw)).quantize(Decimal('.01'), rounding=ROUND_DOWN)
 
     year = data.get("year")
     month = data.get("month")
@@ -138,9 +159,11 @@ def delete_transaction(id):
 
     return jsonify(t.serialize)
 
+
 @main.errorhandler(404)
 def page_not_found(e):
     return "404 - Page not found!", 404
+
 
 @main.errorhandler(500)
 def internal_server_error(e):

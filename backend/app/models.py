@@ -9,7 +9,7 @@ class User(db.Model):
     name = db.Column(db.String(64), nullable=False)
     username = db.Column(db.String(64), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
-    monthly_budget = db.Column(db.Numeric(scale=2, decimal_return_scale=2))
+    monthly_budget = db.Column(db.Numeric(precision=2, scale=2, decimal_return_scale=2))
     transactions = db.relationship("Transaction", backref="users", lazy=True)
     transactions_months = db.relationship("TransactionMonth", backref="users", lazy=True)
 
