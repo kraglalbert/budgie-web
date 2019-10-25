@@ -27,9 +27,10 @@ class User(db.Model):
 
     @staticmethod
     def generate_test_user():
-        user = User(name="Albert Kragl", username="akragl")
+        user = User(name="Albert Kragl", username="akragl", password='password')
         db.session.add(user)
         db.session.commit()
+        return user
 
     @property
     def serialize(self):
