@@ -58,9 +58,9 @@ class Transaction(db.Model):
     __tablename__ = "transactions"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64), unique=False, nullable=False)
-    source = db.Column(db.String(64))
+    source = db.Column(db.String(64), nullable=False)
     # amount in cents
-    amount = db.Column(db.Integer)
+    amount = db.Column(db.Integer, nullable=False)
     date = db.Column(db.Date, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     transaction_month_id = db.Column(db.Integer, db.ForeignKey("transaction_months.id"), nullable=False)
