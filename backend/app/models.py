@@ -9,7 +9,8 @@ class User(db.Model):
     name = db.Column(db.String(64), nullable=False)
     username = db.Column(db.String(64), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
-    monthly_budget = db.Column(db.Numeric(precision=2, scale=2, decimal_return_scale=2))
+    # amount in cents
+    monthly_budget = db.Column(db.Integer)
     transactions = db.relationship("Transaction", backref="users", lazy=True)
     transactions_months = db.relationship("TransactionMonth", backref="users", lazy=True)
 
@@ -37,7 +38,7 @@ class User(db.Model):
             "id": self.id,
             "name": self.name,
             "password_hash": self.password_hash,
-            "monthly_budget": json.dumps(float(self.monthly_budget)) if self.monthly_budget is not None else 0,
+            "monthly_budget": self.monthly_budget if self.monthly_budget is not None else 0,
             "transactions": Transaction.serialize_list(self.transactions),
             "username": self.username,
         }
@@ -58,7 +59,8 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64), unique=False, nullable=False)
     source = db.Column(db.String(64))
-    amount = db.Column(db.Numeric(scale=2, decimal_return_scale=2), nullable=False)
+    # amount in cents
+    amount = db.Column(db.Integer)
     date = db.Column(db.Date, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     transaction_month_id = db.Column(db.Integer, db.ForeignKey("transaction_months.id"), nullable=False)
@@ -70,7 +72,7 @@ class Transaction(db.Model):
             "id": self.id,
             "title": self.title,
             "source": self.source,
-            "amount": json.dumps(float(self.amount)),
+            "amount": self.amount,
             "date": self.date,
             "user_id": self.user_id,
             "transaction_month_id": self.transaction_month_id
