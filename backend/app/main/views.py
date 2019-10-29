@@ -75,7 +75,7 @@ def transactions():
 
 # get transactions for user
 @main.route("/transactions/user/<int:user_id>", methods=["GET"])
-def transactions_for_user(user_id):
+def get_transactions_for_user(user_id):
     year = request.args.get("year")
     month = request.args.get("month")
 
@@ -105,8 +105,10 @@ def transactions_for_user(user_id):
         )
 
     # get transactions for specified month and year
-    t_month = TransactionMonth.query.filter_by(
-        date=datetime.datetime(int(year), int(month), 1), user_id=user_id
+    t_month = TransactionMonth.query.filter(
+        extract("year", TransactionMonth.date) == int(year),
+        extract("month", TransactionMonth.date) == int(month),
+        TransactionMonth.user_id == user_id,
     ).first()
     if t_month is None:
         return make_response(
