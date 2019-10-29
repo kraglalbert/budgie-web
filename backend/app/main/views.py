@@ -1,5 +1,4 @@
 import datetime
-from decimal import Decimal, ROUND_DOWN
 from flask import Flask, jsonify, request, abort, make_response
 from sqlalchemy import extract
 from . import main
@@ -50,10 +49,7 @@ def create_user():
 @main.route("/users/<int:user_id>/set-budget", methods=["PUT"])
 def update_user_budget(user_id):
     data = request.get_json(force=True)
-    monthly_budget_raw = data.get("monthly_budget")
-    monthly_budget = Decimal(str(monthly_budget_raw)).quantize(
-        Decimal(".01"), rounding=ROUND_DOWN
-    )
+    monthly_budget = int(data.get("monthly_budget"))
 
     user = User.query.filter_by(id=user_id).first()
     if user == None:
@@ -136,8 +132,7 @@ def create_transaction():
     data = request.get_json(force=True)
     title = data.get("title")
     source = data.get("source")
-    amount_raw = data.get("amount")
-    amount = Decimal(str(amount_raw)).quantize(Decimal(".01"), rounding=ROUND_DOWN)
+    amount = int(data.get("amount"))
     username = data.get("username")
 
     year = data.get("year")
@@ -148,8 +143,10 @@ def create_transaction():
 
     user = User.query.filter_by(username=username).first()
     # check if transaction month exists
-    t_month = TransactionMonth.query.filter_by(
-        date=datetime.datetime(int(year), int(month), 1), user_id=user.id
+    t_month = TransactionMonth.query.filter(
+        extract("year", TransactionMonth.date) == int(year),
+        extract("month", TransactionMonth.date) == int(month),
+        TransactionMonth.user_id == user.id,
     ).first()
     if t_month is None:
         # create transaction month object if it doesn't exist
@@ -179,8 +176,7 @@ def update_transaction(id):
     data = request.get_json(force=True)
     title = data.get("title")
     source = data.get("source")
-    amount_raw = data.get("amount")
-    amount = Decimal(str(amount_raw)).quantize(Decimal(".01"), rounding=ROUND_DOWN)
+    amount = int(data.get("amount"))
 
     year = data.get("year")
     month = data.get("month")
@@ -203,7 +199,6 @@ def update_transaction(id):
 # delete a transaction by ID
 @main.route("/transactions/delete/<int:id>", methods=["DELETE"])
 def delete_transaction(id):
-    data = request.get_json(force=True)
     t = Transaction.query.filter_by(id=id).first()
 
     db.session.delete(t)
