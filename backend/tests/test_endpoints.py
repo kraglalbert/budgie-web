@@ -20,7 +20,7 @@ class IntegrationTest(unittest.TestCase):
         with self.app.test_client() as c:
             resp = c.get("/users")
             json_data = resp.get_json()
-            self.assertTrue(json_data is not None)
+            # self.assertTrue(json_data is not None)
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(json_data, [])
 

@@ -117,7 +117,7 @@ class TransactionMonth(db.Model):
     @staticmethod
     def serialize_list(transaction_months):
         json_transactions_months = []
-        for tm in transactions_months:
+        for tm in transaction_months:
             json_transactions_months.append(tm.serialize)
         return json_transactions_months
 
