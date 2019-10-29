@@ -12,7 +12,9 @@ class User(db.Model):
     # amount in cents
     monthly_budget = db.Column(db.Integer)
     transactions = db.relationship("Transaction", backref="users", lazy=True)
-    transactions_months = db.relationship("TransactionMonth", backref="users", lazy=True)
+    transactions_months = db.relationship(
+        "TransactionMonth", backref="users", lazy=True
+    )
 
     @property
     def password(self):
@@ -27,7 +29,7 @@ class User(db.Model):
 
     @staticmethod
     def generate_test_user():
-        user = User(name="Albert Kragl", username="akragl", password='password')
+        user = User(name="Albert Kragl", username="akragl", password="password")
         db.session.add(user)
         db.session.commit()
         return user
@@ -39,7 +41,9 @@ class User(db.Model):
             "id": self.id,
             "name": self.name,
             "password_hash": self.password_hash,
-            "monthly_budget": self.monthly_budget if self.monthly_budget is not None else 0,
+            "monthly_budget": self.monthly_budget
+            if self.monthly_budget is not None
+            else 0,
             "transactions": Transaction.serialize_list(self.transactions),
             "username": self.username,
         }
@@ -64,7 +68,9 @@ class Transaction(db.Model):
     amount = db.Column(db.Integer, nullable=False)
     date = db.Column(db.Date, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    transaction_month_id = db.Column(db.Integer, db.ForeignKey("transaction_months.id"), nullable=False)
+    transaction_month_id = db.Column(
+        db.Integer, db.ForeignKey("transaction_months.id"), nullable=False
+    )
 
     @property
     def serialize(self):
@@ -76,7 +82,7 @@ class Transaction(db.Model):
             "amount": self.amount,
             "date": self.date,
             "user_id": self.user_id,
-            "transaction_month_id": self.transaction_month_id
+            "transaction_month_id": self.transaction_month_id,
         }
 
     @staticmethod
@@ -89,12 +95,15 @@ class Transaction(db.Model):
     def __repr__(self):
         return "<Transaction %r>" % self.title
 
+
 class TransactionMonth(db.Model):
     __tablename__ = "transaction_months"
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    transactions = db.relationship("Transaction", backref="transaction_months", lazy=True)
+    transactions = db.relationship(
+        "Transaction", backref="transaction_months", lazy=True
+    )
 
     @property
     def serialize(self):

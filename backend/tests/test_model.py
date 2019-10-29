@@ -5,6 +5,7 @@ from app import create_app, db
 from app.models import User, Transaction, TransactionMonth
 from decimal import *
 
+
 class ModelTest(unittest.TestCase):
     def setUp(self):
         self.app = create_app("testing")
@@ -22,16 +23,26 @@ class ModelTest(unittest.TestCase):
 
     # prefix all test cases with "test_"
     def test_create_user(self):
-        user = User(name="John Doe", username="jdoe", password="goodpass", monthly_budget=Decimal('500.00'))
+        user = User(
+            name="John Doe",
+            username="jdoe",
+            password="goodpass",
+            monthly_budget=Decimal("500.00"),
+        )
         db.session.add(user)
         db.session.commit()
 
         user = User.query.filter_by(username="jdoe").first()
         self.assertTrue(user is not None)
-        self.assertTrue(user.monthly_budget == Decimal('500.00'))
+        self.assertTrue(user.monthly_budget == Decimal("500.00"))
 
     def test_delete_user(self):
-        user = User(name="John Doe", username="jdoe", password="goodpass", monthly_budget=Decimal('500.00'))
+        user = User(
+            name="John Doe",
+            username="jdoe",
+            password="goodpass",
+            monthly_budget=Decimal("500.00"),
+        )
         db.session.add(user)
         db.session.commit()
 
@@ -46,7 +57,9 @@ class ModelTest(unittest.TestCase):
 
     def test_create_transaction_month(self):
         # create test user
-        user = User(name="John Doe", username="jdoe", password="goodpass", monthly_budget=50000)
+        user = User(
+            name="John Doe", username="jdoe", password="goodpass", monthly_budget=50000
+        )
         db.session.add(user)
         db.session.commit()
 
@@ -60,7 +73,9 @@ class ModelTest(unittest.TestCase):
 
     def test_create_transaction(self):
         # create test users
-        user = User(name="John Doe", username="jdoe", password="goodpass", monthly_budget=50000)
+        user = User(
+            name="John Doe", username="jdoe", password="goodpass", monthly_budget=50000
+        )
         db.session.add(user)
         db.session.commit()
 
@@ -70,7 +85,14 @@ class ModelTest(unittest.TestCase):
         db.session.commit()
 
         date = datetime.datetime(2019, 11, 3)
-        t = Transaction(title="Groceries", source="Safeway", amount=10145, date=date, user_id=user.id, transaction_month_id=t_month.id)
+        t = Transaction(
+            title="Groceries",
+            source="Safeway",
+            amount=10145,
+            date=date,
+            user_id=user.id,
+            transaction_month_id=t_month.id,
+        )
 
         db.session.add(t)
         db.session.commit()
@@ -81,5 +103,3 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(t.amount, 10145)
         self.assertEqual(t.source, "Safeway")
         self.assertEqual(t.title, "Groceries")
-
-    

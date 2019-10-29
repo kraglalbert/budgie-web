@@ -87,7 +87,10 @@ def get_transactions_for_user(user_id):
         ).all()
         if t_months is None:
             return make_response(
-                jsonify(message="No transactions exist for this user in the specified year"), 400
+                jsonify(
+                    message="No transactions exist for this user in the specified year"
+                ),
+                400,
             )
         transactions = []
         for t_month in t_months:

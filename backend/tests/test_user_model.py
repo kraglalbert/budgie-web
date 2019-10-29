@@ -7,7 +7,7 @@ from app.models import User
 
 class UserModelTestCase(unittest.TestCase):
     def setUp(self):
-        self.app = create_app('testing')
+        self.app = create_app("testing")
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
@@ -28,11 +28,10 @@ class UserModelTestCase(unittest.TestCase):
 
     def test_password_verification(self):
         u = User.generate_test_user()
-        self.assertTrue(u.verify_password('password'))
-        self.assertFalse(u.verify_password('notpassword'))
+        self.assertTrue(u.verify_password("password"))
+        self.assertFalse(u.verify_password("notpassword"))
 
     def test_password_salts_are_random(self):
-        u = User(name="Albert Kragl", username="akragl", password='password')
-        u2 = User(name="Kragl Albert", username="kragla", password='password')
+        u = User(name="Albert Kragl", username="akragl", password="password")
+        u2 = User(name="Kragl Albert", username="kragla", password="password")
         self.assertTrue(u.password_hash != u2.password_hash)
-
