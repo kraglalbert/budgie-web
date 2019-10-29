@@ -33,17 +33,21 @@ class IntegrationTest(unittest.TestCase):
         with self.app.test_client() as c:
             resp = c.post(
                 "/users/create",
-                json={"name": "John Doe", "username": "jdoe", "password": "secret"},
+                json={
+                    "name": "John Doe",
+                    "email": "jdoe@gmail.com",
+                    "password": "secret",
+                },
             )
             self.assertEqual(resp.status_code, 200)
 
             # get user by username
-            resp = c.get("/users/jdoe")
+            resp = c.get("/users/jdoe@gmail.com")
             self.assertEqual(resp.status_code, 200)
 
             json_data = resp.get_json()
             self.assertTrue(json_data is not None)
-            self.assertEqual(json_data["username"], "jdoe")
+            self.assertEqual(json_data["email"], "jdoe@gmail.com")
 
             # get user by ID
             user_id = json_data["id"]
@@ -66,7 +70,7 @@ class IntegrationTest(unittest.TestCase):
                     "title": TITLE,
                     "source": SOURCE,
                     "amount": AMOUNT,
-                    "username": user.username,
+                    "email": user.email,
                     "year": YEAR,
                     "month": MONTH,
                     "day": DAY,

@@ -22,10 +22,10 @@ def get_user_by_id(user_id):
     return jsonify(user.serialize)
 
 
-# get user by username
-@main.route("/users/<username>", methods=["GET"])
-def get_user_by_username(username):
-    user = User.query.filter_by(username=username).first()
+# get user by email
+@main.route("/users/<email>", methods=["GET"])
+def get_user_by_email(email):
+    user = User.query.filter_by(email=email).first()
     if user == None:
         abort(404)
     return jsonify(user.serialize)
@@ -36,10 +36,10 @@ def get_user_by_username(username):
 def create_user():
     data = request.get_json(force=True)
     name = data.get("name")
-    username = data.get("username")
+    email = data.get("email")
     password = data.get("password")
 
-    new_user = User(name=name, username=username, password=password)
+    new_user = User(name=name, email=email, password=password)
     db.session.add(new_user)
     db.session.commit()
     return jsonify(new_user.serialize)
@@ -133,7 +133,7 @@ def create_transaction():
     title = data.get("title")
     source = data.get("source")
     amount = int(data.get("amount"))
-    username = data.get("username")
+    email = data.get("email")
 
     year = data.get("year")
     month = data.get("month")
@@ -141,7 +141,7 @@ def create_transaction():
 
     date = datetime.datetime(int(year), int(month), int(day))
 
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(email=email).first()
     # check if transaction month exists
     t_month = TransactionMonth.query.filter(
         extract("year", TransactionMonth.date) == int(year),

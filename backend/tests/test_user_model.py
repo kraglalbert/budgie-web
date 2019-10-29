@@ -32,6 +32,6 @@ class UserModelTestCase(unittest.TestCase):
         self.assertFalse(u.verify_password("notpassword"))
 
     def test_password_salts_are_random(self):
-        u = User(name="Albert Kragl", username="akragl", password="password")
-        u2 = User(name="Kragl Albert", username="kragla", password="password")
+        u = User(name="Albert Kragl", email="akragl@gmail.com", password="password")
+        u2 = User(name="Kragl Albert", email="kragla@gmail.com", password="password")
         self.assertTrue(u.password_hash != u2.password_hash)

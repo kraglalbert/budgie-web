@@ -3,7 +3,6 @@ import datetime
 from flask import current_app
 from app import create_app, db
 from app.models import User, Transaction, TransactionMonth
-from decimal import *
 
 
 class ModelTest(unittest.TestCase):
@@ -25,40 +24,43 @@ class ModelTest(unittest.TestCase):
     def test_create_user(self):
         user = User(
             name="John Doe",
-            username="jdoe",
+            email="jdoe@gmail.com",
             password="goodpass",
-            monthly_budget=Decimal("500.00"),
+            monthly_budget=50000,
         )
         db.session.add(user)
         db.session.commit()
 
-        user = User.query.filter_by(username="jdoe").first()
+        user = User.query.filter_by(email="jdoe@gmail.com").first()
         self.assertTrue(user is not None)
-        self.assertTrue(user.monthly_budget == Decimal("500.00"))
+        self.assertTrue(user.monthly_budget == 50000)
 
     def test_delete_user(self):
         user = User(
             name="John Doe",
-            username="jdoe",
+            email="jdoe@gmail.com",
             password="goodpass",
-            monthly_budget=Decimal("500.00"),
+            monthly_budget=50000,
         )
         db.session.add(user)
         db.session.commit()
 
-        user = User.query.filter_by(username="jdoe").first()
+        user = User.query.filter_by(email="jdoe@gmail.com").first()
         self.assertTrue(user is not None)
 
         db.session.delete(user)
         db.session.commit()
 
-        user = User.query.filter_by(username="jdoe").first()
+        user = User.query.filter_by(email="jdoe@gmail.com").first()
         self.assertTrue(user is None)
 
     def test_create_transaction_month(self):
         # create test user
         user = User(
-            name="John Doe", username="jdoe", password="goodpass", monthly_budget=50000
+            name="John Doe",
+            email="jdoe@gmail.com",
+            password="goodpass",
+            monthly_budget=50000,
         )
         db.session.add(user)
         db.session.commit()
@@ -74,7 +76,10 @@ class ModelTest(unittest.TestCase):
     def test_create_transaction(self):
         # create test users
         user = User(
-            name="John Doe", username="jdoe", password="goodpass", monthly_budget=50000
+            name="John Doe",
+            email="jdoe@gmail.com",
+            password="goodpass",
+            monthly_budget=50000,
         )
         db.session.add(user)
         db.session.commit()
@@ -97,7 +102,7 @@ class ModelTest(unittest.TestCase):
         db.session.add(t)
         db.session.commit()
 
-        user = User.query.filter_by(username="jdoe").first()
+        user = User.query.filter_by(email="jdoe@gmail.com").first()
         t = user.transactions[0]
         self.assertTrue(t is not None)
         self.assertEqual(t.amount, 10145)

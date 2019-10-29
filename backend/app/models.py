@@ -7,7 +7,7 @@ class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
-    username = db.Column(db.String(64), unique=True, nullable=False)
+    email = db.Column(db.String(64), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     # amount in cents
     monthly_budget = db.Column(db.Integer)
@@ -29,7 +29,7 @@ class User(db.Model):
 
     @staticmethod
     def generate_test_user():
-        user = User(name="Albert Kragl", username="akragl", password="password")
+        user = User(name="Albert Kragl", email="akragl@gmail.com", password="password")
         db.session.add(user)
         db.session.commit()
         return user
@@ -45,7 +45,7 @@ class User(db.Model):
             if self.monthly_budget is not None
             else 0,
             "transactions": Transaction.serialize_list(self.transactions),
-            "username": self.username,
+            "email": self.email,
         }
 
     @staticmethod
@@ -56,7 +56,7 @@ class User(db.Model):
         return json_users
 
     def __repr__(self):
-        return "<User %r>" % self.username
+        return "<User %r>" % self.email
 
 
 class Transaction(db.Model):
