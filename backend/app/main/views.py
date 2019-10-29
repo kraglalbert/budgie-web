@@ -1,6 +1,7 @@
 import datetime
 from decimal import Decimal, ROUND_DOWN
 from flask import Flask, jsonify, request, abort, make_response
+from sqlalchemy import extract
 from . import main
 from .. import db
 from app.models import User, Transaction, TransactionMonth
@@ -11,6 +12,15 @@ from app.models import User, Transaction, TransactionMonth
 def users():
     users = User.query.all()
     return jsonify(User.serialize_list(users))
+
+
+# get user by ID
+@main.route("/users/<int:user_id>", methods=["GET"])
+def get_user_by_id(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user == None:
+        abort(404)
+    return jsonify(user.serialize)
 
 
 # get user by username
@@ -41,7 +51,9 @@ def create_user():
 def update_user_budget(user_id):
     data = request.get_json(force=True)
     monthly_budget_raw = data.get("monthly_budget")
-    monthly_budget = Decimal(str(monthly_budget_raw)).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+    monthly_budget = Decimal(str(monthly_budget_raw)).quantize(
+        Decimal(".01"), rounding=ROUND_DOWN
+    )
 
     user = User.query.filter_by(id=user_id).first()
     if user == None:
@@ -61,19 +73,45 @@ def transactions():
     return jsonify(Transaction.serialize_list(transactions))
 
 
-# get all transactions for user
-@main.route("/transactions/<int:user_id>", methods=["GET"])
+# get transactions for user
+@main.route("/transactions/user/<int:user_id>", methods=["GET"])
 def transactions_for_user(user_id):
-    transactions = Transaction.query.filter_by(user_id=user_id).all()
-    return jsonify(Transaction.serialize_list(transactions))
+    year = request.args.get("year")
+    month = request.args.get("month")
 
+    if year is not None and month is None:
+        # get all transactions for specified year
+        t_months = TransactionMonth.query.filter(
+            extract("year", TransactionMonth.date) == int(year),
+            TransactionMonth.user_id == user_id,
+        ).all()
+        if t_months is None:
+            return make_response(
+                jsonify(message="No transactions exist for this user in the specified year"), 400
+            )
+        transactions = []
+        for t_month in t_months:
+            transactions.extend(t_month.transactions)
+        return jsonify(Transaction.serialize_list(transactions))
 
-# get all transactions for user for specified month and year
-@main.route("/transactions/<int:user_id>/<int:year>/<int:month>", methods=["GET"])
-def transactions_for_user_month(user_id, year, month):
-    t_month = TransactionMonth.query.filter_by(date=datetime.datetime(int(year), int(month), 1), user_id=user_id).first()
+    if year is None and month is None:
+        # return all transactions for user
+        transactions = Transaction.query.filter_by(user_id=user_id).all()
+        return jsonify(Transaction.serialize_list(transactions))
+
+    if year is None and month is not None:
+        return make_response(
+            jsonify(message="Must specify a year with optional month"), 400
+        )
+
+    # get transactions for specified month and year
+    t_month = TransactionMonth.query.filter_by(
+        date=datetime.datetime(int(year), int(month), 1), user_id=user_id
+    ).first()
     if t_month is None:
-        return make_response(jsonify(message='Transaction month does not exist for specified user'), 400)
+        return make_response(
+            jsonify(message="Transaction month does not exist for specified user"), 400
+        )
     transactions = t_month.transactions
     return jsonify(Transaction.serialize_list(transactions))
 
@@ -94,7 +132,7 @@ def create_transaction():
     title = data.get("title")
     source = data.get("source")
     amount_raw = data.get("amount")
-    amount = Decimal(str(amount_raw)).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+    amount = Decimal(str(amount_raw)).quantize(Decimal(".01"), rounding=ROUND_DOWN)
     username = data.get("username")
 
     year = data.get("year")
@@ -105,15 +143,24 @@ def create_transaction():
 
     user = User.query.filter_by(username=username).first()
     # check if transaction month exists
-    t_month = TransactionMonth.query.filter_by(date=datetime.datetime(int(year), int(month), 1), user_id=user.id).first()
+    t_month = TransactionMonth.query.filter_by(
+        date=datetime.datetime(int(year), int(month), 1), user_id=user.id
+    ).first()
     if t_month is None:
         # create transaction month object if it doesn't exist
-        t_month = TransactionMonth(date=datetime.datetime(int(year), int(month), 1), user_id=user.id)
+        t_month = TransactionMonth(
+            date=datetime.datetime(int(year), int(month), 1), user_id=user.id
+        )
         db.session.add(t_month)
         db.session.commit()
 
     new_transaction = Transaction(
-        title=title, source=source, amount=amount, user_id=user.id, date=date, transaction_month_id=t_month.id
+        title=title,
+        source=source,
+        amount=amount,
+        user_id=user.id,
+        date=date,
+        transaction_month_id=t_month.id,
     )
     db.session.add(new_transaction)
     db.session.commit()
@@ -128,7 +175,7 @@ def update_transaction(id):
     title = data.get("title")
     source = data.get("source")
     amount_raw = data.get("amount")
-    amount = Decimal(str(amount_raw)).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+    amount = Decimal(str(amount_raw)).quantize(Decimal(".01"), rounding=ROUND_DOWN)
 
     year = data.get("year")
     month = data.get("month")
