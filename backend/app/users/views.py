@@ -17,7 +17,7 @@ def get_all_users():
 def get_user_by_id(user_id):
     user = User.query.filter_by(id=user_id).first()
     if user == None:
-        abort(404)
+        abort(404, "No user found with specified ID")
     return jsonify(user.serialize)
 
 
@@ -26,7 +26,7 @@ def get_user_by_id(user_id):
 def get_user_by_email(email):
     user = User.query.filter_by(email=email).first()
     if user == None:
-        abort(404)
+        abort(404, "No user found with specified email")
     return jsonify(user.serialize)
 
 
@@ -37,6 +37,9 @@ def create_user():
     name = data.get("name")
     email = data.get("email")
     password = data.get("password")
+
+    if name == "" or email == "" or password == "":
+        abort(400, "Cannot have empty fields for user")
 
     new_user = User(name=name, email=email, password=password)
     db.session.add(new_user)
@@ -50,9 +53,12 @@ def update_user_budget(user_id):
     data = request.get_json(force=True)
     monthly_budget = int(data.get("monthly_budget"))
 
+    if monthly_budget < 0:
+        abort(400, "Monthly budget cannot be negative")
+
     user = User.query.filter_by(id=user_id).first()
     if user == None:
-        abort(404)
+        abort(404, "No user found with specified ID")
 
     user.monthly_budget = monthly_budget
 

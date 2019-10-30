@@ -25,12 +25,8 @@ def get_transactions_for_user(user_id):
             TransactionMonth.user_id == user_id,
         ).all()
         if t_months is None:
-            return make_response(
-                jsonify(
-                    message="No transactions exist for this user in the specified year"
-                ),
-                400,
-            )
+            abort(400, "No transactions exist for this user in the specified year")
+
         transactions = []
         for t_month in t_months:
             transactions.extend(t_month.transactions)
@@ -42,9 +38,7 @@ def get_transactions_for_user(user_id):
         return jsonify(Transaction.serialize_list(transactions))
 
     if year is None and month is not None:
-        return make_response(
-            jsonify(message="Must specify a year with optional month"), 400
-        )
+        abort(400, "Must specify a year with optional month")
 
     # get transactions for specified month and year
     t_month = TransactionMonth.query.filter(
@@ -53,9 +47,8 @@ def get_transactions_for_user(user_id):
         TransactionMonth.user_id == user_id,
     ).first()
     if t_month is None:
-        return make_response(
-            jsonify(message="Transaction month does not exist for specified user"), 400
-        )
+        abort(400, "Transaction month does not exist for specified user")
+
     transactions = t_month.transactions
     return jsonify(Transaction.serialize_list(transactions))
 
@@ -65,7 +58,7 @@ def get_transactions_for_user(user_id):
 def get_transaction(id):
     t = Transaction.query.filter_by(id=id).first()
     if t == None:
-        abort(404)
+        abort(404, "No transaction found with specified ID")
     return jsonify(t.serialize)
 
 
@@ -91,14 +84,17 @@ def create_transaction():
         or month is None
         or day is None
     ):
-        abort(400)
+        abort(400, "Cannot have empty fields for transaction")
 
     try:
         date = datetime.datetime(int(year), int(month), int(day))
     except ValueError:
-        abort(400)
+        abort(400, "Invalid date given for transaction")
 
     user = User.query.filter_by(email=email).first()
+    if user is None:
+        abort(404, "User does not exist")
+
     # check if transaction month exists
     t_month = TransactionMonth.query.filter(
         extract("year", TransactionMonth.date) == int(year),
@@ -147,14 +143,17 @@ def update_transaction(id):
         or month is None
         or day is None
     ):
-        abort(400)
+        abort(400, "Cannot have empty fields for transaction")
 
     try:
         date = datetime.datetime(int(year), int(month), int(day))
     except ValueError:
-        abort(400)
+        abort(400, "Invalid date given for transaction")
 
     t = Transaction.query.filter_by(id=id).first()
+    if t is None:
+        abort(404, "No transaction found with specified ID")
+
     t.title = title
     t.source = source
     t.amount = amount
@@ -171,7 +170,7 @@ def update_transaction(id):
 def delete_transaction(id):
     t = Transaction.query.filter_by(id=id).first()
     if t == None:
-        abort(404)
+        abort(404, "No transaction found with specified ID")
 
     db.session.delete(t)
     db.session.commit()
