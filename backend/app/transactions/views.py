@@ -82,7 +82,21 @@ def create_transaction():
     month = data.get("month")
     day = data.get("day")
 
-    date = datetime.datetime(int(year), int(month), int(day))
+    if (
+        title == ""
+        or source == ""
+        or amount is None
+        or email == ""
+        or year is None
+        or month is None
+        or day is None
+    ):
+        abort(400)
+
+    try:
+        date = datetime.datetime(int(year), int(month), int(day))
+    except ValueError:
+        abort(400)
 
     user = User.query.filter_by(email=email).first()
     # check if transaction month exists
@@ -125,7 +139,20 @@ def update_transaction(id):
     month = data.get("month")
     day = data.get("day")
 
-    date = datetime.datetime(int(year), int(month), int(day))
+    if (
+        title == ""
+        or source == ""
+        or amount is None
+        or year is None
+        or month is None
+        or day is None
+    ):
+        abort(400)
+
+    try:
+        date = datetime.datetime(int(year), int(month), int(day))
+    except ValueError:
+        abort(400)
 
     t = Transaction.query.filter_by(id=id).first()
     t.title = title
@@ -143,6 +170,8 @@ def update_transaction(id):
 @transactions.route("/delete/<int:id>", methods=["DELETE"])
 def delete_transaction(id):
     t = Transaction.query.filter_by(id=id).first()
+    if t == None:
+        abort(404)
 
     db.session.delete(t)
     db.session.commit()

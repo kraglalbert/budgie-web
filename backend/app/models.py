@@ -81,6 +81,9 @@ class Transaction(db.Model):
             "source": self.source,
             "amount": self.amount,
             "date": self.date,
+            "year": self.date.year,
+            "month": self.date.month,
+            "day": self.date.day,
             "user_id": self.user_id,
             "transaction_month_id": self.transaction_month_id,
         }
@@ -111,6 +114,8 @@ class TransactionMonth(db.Model):
         return {
             "id": self.id,
             "date": self.date,
+            "year": self.date.year,
+            "month": self.date.month,
             "transactions": self.transactions,
         }
 
