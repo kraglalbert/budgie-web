@@ -29,6 +29,11 @@ class TransactionsIntegrationTest(unittest.TestCase):
 
         with self.app.test_client() as c:
             resp = c.post(
+                "/account/login", json={"email": user.email, "password": "password"},
+            )
+            self.assertEqual(resp.status_code, 200)
+
+            resp = c.post(
                 "/transactions/create",
                 json={
                     "title": TITLE,
@@ -94,7 +99,14 @@ class TransactionsIntegrationTest(unittest.TestCase):
             self.assertEqual(resp.status_code, 400)
 
     def test_create_transaction_invalid(self):
+        user = User.generate_test_user()
+
         with self.app.test_client() as c:
+            resp = c.post(
+                "/account/login", json={"email": user.email, "password": "password"},
+            )
+            self.assertEqual(resp.status_code, 200)
+
             # create with invalid date
             resp = c.post(
                 "/transactions/create",
@@ -102,7 +114,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
                     "title": TITLE,
                     "source": SOURCE,
                     "amount": 1000,
-                    "email": "test@gmail.com",
+                    "email": user.email,
                     "year": 0,
                     "month": 0,
                     "day": 0,
@@ -129,6 +141,11 @@ class TransactionsIntegrationTest(unittest.TestCase):
         user = User.generate_test_user()
 
         with self.app.test_client() as c:
+            resp = c.post(
+                "/account/login", json={"email": user.email, "password": "password"},
+            )
+            self.assertEqual(resp.status_code, 200)
+
             resp = c.post(
                 "/transactions/create",
                 json={
@@ -165,6 +182,11 @@ class TransactionsIntegrationTest(unittest.TestCase):
         user = User.generate_test_user()
 
         with self.app.test_client() as c:
+            resp = c.post(
+                "/account/login", json={"email": user.email, "password": "password"},
+            )
+            self.assertEqual(resp.status_code, 200)
+
             resp = c.post(
                 "/transactions/create",
                 json={

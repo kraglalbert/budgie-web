@@ -16,16 +16,19 @@ class UsersIntegrationTest(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
 
-    def test_get_users_empty(self):
-        with self.app.test_client() as c:
-            resp = c.get("/users")
-            json_data = resp.get_json()
-            # self.assertTrue(json_data is not None)
-            self.assertEqual(resp.status_code, 200)
-            self.assertEqual(json_data, [])
-
     def test_user_not_found(self):
+        user = User.generate_test_user()
+
         with self.app.test_client() as c:
+            resp = c.post(
+                "/account/login", json={"email": user.email, "password": "password"},
+            )
+            self.assertEqual(resp.status_code, 200)
+
             resp = c.get("/users/jdoe")
             self.assertEqual(resp.status_code, 404)
 
+    def test_unauthorized_user(self):
+        with self.app.test_client() as c:
+            resp = c.get("/users/jdoe")
+            self.assertEqual(resp.status_code, 401)

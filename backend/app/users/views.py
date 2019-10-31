@@ -8,6 +8,7 @@ from app.models import User, Transaction, TransactionMonth
 
 # get all users
 @users.route("", methods=["GET"])
+@login_required
 def get_all_users():
     users = User.query.all()
     return jsonify(User.serialize_list(users))
@@ -15,6 +16,7 @@ def get_all_users():
 
 # get user by ID
 @users.route("/<int:user_id>", methods=["GET"])
+@login_required
 def get_user_by_id(user_id):
     user = User.query.filter_by(id=user_id).first()
     if user == None:
@@ -24,6 +26,7 @@ def get_user_by_id(user_id):
 
 # get user by email
 @users.route("/<email>", methods=["GET"])
+@login_required
 def get_user_by_email(email):
     user = User.query.filter_by(email=email).first()
     if user == None:
@@ -31,25 +34,9 @@ def get_user_by_email(email):
     return jsonify(user.serialize)
 
 
-# create a new user
-@users.route("/create", methods=["POST"])
-def create_user():
-    data = request.get_json(force=True)
-    name = data.get("name")
-    email = data.get("email")
-    password = data.get("password")
-
-    if name == "" or email == "" or password == "":
-        abort(400, "Cannot have empty fields for user")
-
-    new_user = User(name=name, email=email, password=password)
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify(new_user.serialize)
-
-
 # set a user's monthly budget
 @users.route("/<int:user_id>/set-budget", methods=["PUT"])
+@login_required
 def update_user_budget(user_id):
     data = request.get_json(force=True)
     monthly_budget = int(data.get("monthly_budget"))

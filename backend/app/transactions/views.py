@@ -1,5 +1,6 @@
 import datetime
 from flask import Flask, jsonify, request, abort, make_response
+from flask_login import login_required
 from sqlalchemy import extract
 from . import transactions
 from .. import db
@@ -7,6 +8,7 @@ from app.models import User, Transaction, TransactionMonth
 
 # get all transactions
 @transactions.route("", methods=["GET"])
+@login_required
 def get_transactions():
     transactions = Transaction.query.all()
     return jsonify(Transaction.serialize_list(transactions))
@@ -14,6 +16,7 @@ def get_transactions():
 
 # get transactions for user
 @transactions.route("/user/<int:user_id>", methods=["GET"])
+@login_required
 def get_transactions_for_user(user_id):
     year = request.args.get("year")
     month = request.args.get("month")
@@ -55,6 +58,7 @@ def get_transactions_for_user(user_id):
 
 # get a transaction by ID
 @transactions.route("/<int:id>", methods=["GET"])
+@login_required
 def get_transaction(id):
     t = Transaction.query.filter_by(id=id).first()
     if t == None:
@@ -64,6 +68,7 @@ def get_transaction(id):
 
 # create new transaction
 @transactions.route("/create", methods=["POST"])
+@login_required
 def create_transaction():
     data = request.get_json(force=True)
     title = data.get("title")
@@ -125,6 +130,7 @@ def create_transaction():
 
 # update a transaction by ID
 @transactions.route("/update/<int:id>", methods=["PUT"])
+@login_required
 def update_transaction(id):
     data = request.get_json(force=True)
     title = data.get("title")
@@ -167,6 +173,7 @@ def update_transaction(id):
 
 # delete a transaction by ID
 @transactions.route("/delete/<int:id>", methods=["DELETE"])
+@login_required
 def delete_transaction(id):
     t = Transaction.query.filter_by(id=id).first()
     if t == None:

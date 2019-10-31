@@ -29,6 +29,13 @@ class AccountIntegrationTest(unittest.TestCase):
             )
             self.assertEqual(resp.status_code, 200)
 
+            # log in user
+            resp = c.post(
+                "/account/login",
+                json={"email": "jdoe@gmail.com", "password": "secret"},
+            )
+            self.assertEqual(resp.status_code, 200)
+
             # get user by username
             resp = c.get("/users/jdoe@gmail.com")
             self.assertEqual(resp.status_code, 200)
