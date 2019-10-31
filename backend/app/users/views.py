@@ -47,7 +47,7 @@ def create_user():
     return jsonify(new_user.serialize)
 
 
-# set a user's monthly budgert
+# set a user's monthly budget
 @users.route("/<int:user_id>/set-budget", methods=["PUT"])
 def update_user_budget(user_id):
     data = request.get_json(force=True)
