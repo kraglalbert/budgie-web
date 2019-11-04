@@ -19,7 +19,7 @@ def login():
         and user.verify_password(password)
     ):
         login_user(user)
-        return "Logged in successfully!", 200
+        return jsonify(user.serialize)
     return "Wrong email or password!", 400
 
 

@@ -130,19 +130,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-var config = require('../config')
-
-// Axios config
-const frontendUrl = 'http://' + config.build.host + ':' + config.build.port
-const backendUrl =
-  'http://' + config.build.backendHost + ':' + config.build.backendPort
-
-var AXIOS = axios.create({
-  baseURL: backendUrl,
-  headers: { 'Access-Control-Allow-Origin': frontendUrl, 'Content-Type': 'application/json' }
-})
-
 export default {
   name: 'Login',
 
@@ -159,7 +146,7 @@ export default {
 
   methods: {
     onLogIn () {
-      AXIOS.post('/account/login', { email: this.email, password: this.password })
+      this.$axios.post('/account/login', { email: this.email, password: this.password })
         .then(res => {
           if (res.status === 200) {
             this.$q.notify({
@@ -167,9 +154,15 @@ export default {
               position: 'top',
               textColor: 'white',
               icon: 'cloud_done',
-              message: 'Logged In'
+              message: 'Logged in successfully'
             })
           }
+          // update application state
+          let name = res.data.name
+          let email = this.email
+          this.$store.commit('login', { name, email })
+
+          this.$router.push('/')
         }).catch(_err => {
           this.$q.notify({
             color: 'red-4',
@@ -181,7 +174,7 @@ export default {
         })
     },
     onSignUp () {
-      AXIOS.post('/account/register', {
+      this.$axios.post('/account/register', {
         name: this.name, email: this.email, password: this.password
       }).then(res => {
         if (res.status === 200) {
@@ -192,6 +185,12 @@ export default {
             icon: 'cloud_done',
             message: 'Signed Up Successfully'
           })
+          // update application state
+          let name = res.data.name
+          let email = this.email
+          this.$store.commit('login', { name, email })
+
+          this.$router.push('/')
         }
       }).catch(_err => {
         this.$q.notify({
