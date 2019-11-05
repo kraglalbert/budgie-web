@@ -19,7 +19,8 @@ def login():
         and user.verify_password(password)
     ):
         login_user(user)
-        return jsonify(user.serialize)
+        token = user.generate_auth_token()
+        return jsonify({"user": user.serialize, "token": token.decode("ascii")})
     return "Wrong email or password!", 400
 
 

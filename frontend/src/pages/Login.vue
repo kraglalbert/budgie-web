@@ -53,7 +53,7 @@
                     type="password"
                     hint="Enter your password"
                     lazy-rules
-                    :rules="[ val => val !== null && val !== '' || 'Please type your password']"
+                    :rules="[ val => val !== null && val !== '' || 'Please enter your password']"
                   />
 
                   <div>
@@ -96,7 +96,7 @@
                     type="password"
                     hint="Enter your password"
                     lazy-rules
-                    :rules="[ val => val !== null && val !== '' || 'Please type your password']"
+                    :rules="[ val => val !== null && val !== '' || 'Please enter your password']"
                   />
 
                   <q-input
@@ -146,24 +146,20 @@ export default {
 
   methods: {
     onLogIn () {
-      this.$axios.post('/account/login', { email: this.email, password: this.password })
-        .then(res => {
-          if (res.status === 200) {
-            this.$q.notify({
-              color: 'green-4',
-              position: 'top',
-              textColor: 'white',
-              icon: 'cloud_done',
-              message: 'Logged in successfully'
-            })
-          }
-          // update application state
-          let name = res.data.name
-          let email = this.email
-          this.$store.commit('login', { name, email })
-
+      let email = this.email
+      let password = this.password
+      this.$store.dispatch('login', { email, password })
+        .then(() => {
+          this.$q.notify({
+            color: 'green-4',
+            position: 'top',
+            textColor: 'white',
+            icon: 'cloud_done',
+            message: 'Logged in successfully'
+          })
           this.$router.push('/')
-        }).catch(_err => {
+        })
+        .catch(_err => {
           this.$q.notify({
             color: 'red-4',
             position: 'top',

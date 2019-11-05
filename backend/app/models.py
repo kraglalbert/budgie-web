@@ -1,6 +1,10 @@
 import json
+import base64
 from . import db, login_manager
+from flask import current_app
 from flask_login import UserMixin
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import BadSignature, SignatureExpired
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -27,6 +31,22 @@ class User(UserMixin, db.Model):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def generate_auth_token(self, expiration=604800):
+        s = Serializer(current_app.config["SECRET_KEY"], expiration)
+        return s.dumps({"token": self.id})
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config["SECRET_KEY"])
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            return None  # valid token, but expired
+        except BadSignature:
+            return None  # invalid token
+        user = User.query.get(data["id"])
+        return user
 
     @staticmethod
     def generate_test_user():
@@ -63,6 +83,32 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+@login_manager.request_loader
+def load_user_from_request(request):
+    # first, try to login using the api_key url arg
+    api_key = request.args.get("api_key")
+    if api_key:
+        user = User.verify_auth_token(api_key)
+        if user:
+            return user
+
+    # next, try to login using Basic Auth
+    api_key = request.headers.get("Authorization")
+    print(api_key)
+    if api_key:
+        api_key = api_key.replace("Basic ", "", 1)
+        try:
+            api_key = base64.b64decode(api_key)
+        except TypeError:
+            pass
+        user = User.verify_auth_token(api_key)
+        if user:
+            return user
+
+    # finally, return None if both methods did not login the user
+    return None
 
 
 class Transaction(db.Model):
