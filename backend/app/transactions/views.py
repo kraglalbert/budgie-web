@@ -2,6 +2,7 @@ import datetime
 from flask import Flask, jsonify, request, abort, make_response
 from flask_login import login_required
 from sqlalchemy import extract
+from calendar import monthrange
 from . import transactions
 from .. import db
 from app.models import User, Transaction, TransactionMonth
@@ -54,6 +55,51 @@ def get_transactions_for_user(user_id):
 
     transactions = t_month.transactions
     return jsonify(Transaction.serialize_list(transactions))
+
+
+# get amount spent each day for specified month
+@transactions.route("/user/<int:user_id>/by-day", methods=["GET"])
+@login_required
+def get_amount_by_day(user_id):
+    year = int(request.args.get("year"))
+    month = int(request.args.get("month"))
+    transaction_type = request.args.get("type")
+
+    if year is None or month is None:
+        abort(400, "Must specify month and year")
+
+    if month < 1 or month > 12:
+        abort(400, "Invalid value for month")
+
+    # get transactions for specified month and year
+    t_month = TransactionMonth.query.filter(
+        extract("year", TransactionMonth.date) == int(year),
+        extract("month", TransactionMonth.date) == int(month),
+        TransactionMonth.user_id == user_id,
+    ).first()
+    if t_month is None:
+        abort(400, "Transaction month does not exist for specified user")
+
+    transactions = t_month.transactions
+    if transaction_type is not None:
+        if transaction_type == "spendings":
+            transactions = filter(lambda t: t.amount < 0, transactions)
+        elif transaction_type == "profits":
+            transactions = filter(lambda t: t.amount > 0, transactions)
+
+    # get number of days in the specified month
+    num_days_tuple = monthrange(year, month)
+    num_days = num_days_tuple[1]
+
+    spendings_per_day = {}
+    for i in range(1, num_days + 1):
+        spendings_per_day[i] = 0
+
+    for t in transactions:
+        t_day = t.date.day
+        spendings_per_day[t_day] += t.amount
+
+    return jsonify(spendings_per_day)
 
 
 # get a transaction by ID
