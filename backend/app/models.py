@@ -45,7 +45,7 @@ class User(UserMixin, db.Model):
             return None  # valid token, but expired
         except BadSignature:
             return None  # invalid token
-        user = User.query.get(data["id"])
+        user = User.query.get(data["token"])
         return user
 
     @staticmethod
@@ -87,23 +87,23 @@ def load_user(user_id):
 
 @login_manager.request_loader
 def load_user_from_request(request):
-    # first, try to login using the api_key url arg
-    api_key = request.args.get("api_key")
-    if api_key:
-        user = User.verify_auth_token(api_key)
+    # first, try to login using the token URL arg
+    token = request.args.get("token")
+    if token:
+        user = User.verify_auth_token(token)
         if user:
             return user
 
     # next, try to login using Basic Auth
-    api_key = request.headers.get("Authorization")
-    print(api_key)
-    if api_key:
-        api_key = api_key.replace("Basic ", "", 1)
+    token = request.headers.get("Authorization")
+    print(token)
+    if token:
+        token = token.replace("Basic ", "", 1)
         try:
-            api_key = base64.b64decode(api_key)
+            token = base64.b64decode(token)
         except TypeError:
             pass
-        user = User.verify_auth_token(api_key)
+        user = User.verify_auth_token(token)
         if user:
             return user
 

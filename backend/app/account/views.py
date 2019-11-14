@@ -24,6 +24,19 @@ def login():
     return "Wrong email or password!", 400
 
 
+# check if token is valid and return user
+@account.route("/token", methods=["POST"])
+def verify_token():
+    data = request.get_json(force=True)
+    token = data.get("token")
+
+    user = User.verify_auth_token(token)
+    if user is None:
+        abort(404, "Token does not match any user")
+
+    return jsonify(user.serialize)
+
+
 # register a new user
 @account.route("/register", methods=["POST"])
 def register():
