@@ -35,6 +35,10 @@ def register():
     if name == "" or email == "" or password == "":
         abort(400, "Cannot have empty fields for user")
 
+    user = User.query.filter_by(email=email).first()
+    if user is not None:
+        abort(400, "Account already exists with this email")
+
     new_user = User(name=name, email=email, password=password)
     db.session.add(new_user)
     db.session.commit()
