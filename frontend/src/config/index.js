@@ -2,9 +2,9 @@ var path = require('path')
 
 module.exports = {
   build: {
-    host: process.env.NODE_ENV === 'development' ? '127.0.0.1' : '',
+    host: process.env.NODE_ENV === 'development' ? 'http://127.0.0.1' : '',
     port: process.env.NODE_ENV === 'development' ? 8080 : 443,
-    backendHost: process.env.NODE_ENV === 'development' ? '127.0.0.1' : '',
+    backendHost: process.env.NODE_ENV === 'development' ? 'http://127.0.0.1' : '',
     backendPort: process.env.NODE_ENV === 'development' ? 5000 : 443,
     index: path.resolve(__dirname, '../dist/index.html'),
     assetsRoot: path.resolve(__dirname, '../dist'),

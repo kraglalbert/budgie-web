@@ -10,9 +10,8 @@ Vue.use(VueRouter)
 var config = require('../config')
 
 // Axios config
-const frontendUrl = 'http://' + config.build.host + ':' + config.build.port
-const backendUrl =
-  'http://' + config.build.backendHost + ':' + config.build.backendPort
+const frontendUrl = config.build.host + ':' + config.build.port
+const backendUrl = config.build.backendHost + ':' + config.build.backendPort
 
 var AXIOS = axios.create({
   baseURL: backendUrl,
@@ -66,6 +65,7 @@ export default function (/* { store, ssrContext } */) {
             next()
           })
       }
+      next()
     } else {
       next() // always call next()
     }

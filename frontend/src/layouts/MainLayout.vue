@@ -11,7 +11,26 @@
           round
           icon="settings"
           aria-label="Settings"
-        />
+        >
+          <q-menu>
+            <q-list style="min-width: 100px">
+              <q-item
+                clickable
+                v-close-popup
+              >
+                <q-item-section>Settings</q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item
+                clickable
+                v-close-popup
+                @click="logout"
+              >
+                <q-item-section>Log Out</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -27,6 +46,14 @@ export default {
 
   data () {
     return {
+    }
+  },
+  methods: {
+    logout: function () {
+      this.$store.dispatch('logout')
+        .then(
+          this.$router.push({ path: 'login' })
+        )
     }
   }
 }

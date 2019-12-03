@@ -157,7 +157,7 @@ export default {
             icon: 'cloud_done',
             message: 'Logged in successfully'
           })
-          this.$router.push('/')
+          this.$router.push({ path: '/home' })
         })
         .catch(_err => {
           this.$q.notify({
@@ -186,7 +186,7 @@ export default {
           let email = this.email
           this.$store.commit('login', { name, email })
 
-          this.$router.push('/')
+          this.$router.push({ path: '/home' })
         }
       }).catch(_err => {
         this.$q.notify({

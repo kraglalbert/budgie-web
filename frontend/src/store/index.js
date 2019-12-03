@@ -9,9 +9,9 @@ Vue.use(Vuex)
 var config = require('../config')
 
 // Axios config
-const frontendUrl = 'http://' + config.build.host + ':' + config.build.port
+const frontendUrl = config.build.host + ':' + config.build.port
 const backendUrl =
-  'http://' + config.build.backendHost + ':' + config.build.backendPort
+  config.build.backendHost + ':' + config.build.backendPort
 
 var AXIOS = axios.create({
   baseURL: backendUrl,
