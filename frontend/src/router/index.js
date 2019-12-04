@@ -49,7 +49,6 @@ export default function (/* { store, ssrContext } */) {
         const token = Store.state.token
         AXIOS.post('/account/token', { token: token })
           .then(resp => {
-            console.log(resp.data)
             Store.commit('set_user', resp.data)
             next()
           })
@@ -64,8 +63,9 @@ export default function (/* { store, ssrContext } */) {
               )
             next()
           })
+      } else {
+        next()
       }
-      next()
     } else {
       next() // always call next()
     }

@@ -4,7 +4,7 @@
       <q-toolbar>
         <q-toolbar-title>budgie</q-toolbar-title>
 
-        <div>{{ $store.state.currentUser.name }}</div>
+        <div style="padding-right: 10px">{{ $store.state.currentUser.name }}</div>
         <q-btn
           flat
           dense

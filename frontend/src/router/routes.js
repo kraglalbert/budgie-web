@@ -3,11 +3,11 @@ const routes = [
     path: '/home',
     component: () => import('layouts/MainLayout.vue'),
     meta: { requiresAuth: true },
-    children: [{ path: '', component: () => import('pages/Index.vue') }]
+    children: [{ path: '', component: () => import('pages/HomePage.vue') }]
   },
   {
     path: '/login',
-    component: () => import('pages/Login.vue'),
+    component: () => import('pages/LoginPage.vue'),
     children: []
   }
 ]

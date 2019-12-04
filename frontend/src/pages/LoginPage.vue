@@ -131,7 +131,7 @@
 
 <script>
 export default {
-  name: 'Login',
+  name: 'LoginPage',
 
   data () {
     return {
@@ -139,7 +139,6 @@ export default {
       email: null,
       password: null,
       confirm_password: null,
-
       tab: 'login'
     }
   },

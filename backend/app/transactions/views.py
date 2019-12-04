@@ -51,7 +51,7 @@ def get_transactions_for_user(user_id):
         TransactionMonth.user_id == user_id,
     ).first()
     if t_month is None:
-        abort(400, "Transaction month does not exist for specified user")
+        return jsonify([])
 
     transactions = t_month.transactions
     return jsonify(Transaction.serialize_list(transactions))

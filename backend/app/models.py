@@ -96,13 +96,7 @@ def load_user_from_request(request):
 
     # next, try to login using Basic Auth
     token = request.headers.get("Authorization")
-    print(token)
     if token:
-        token = token.replace("Basic ", "", 1)
-        try:
-            token = base64.b64decode(token)
-        except TypeError:
-            pass
         user = User.verify_auth_token(token)
         if user:
             return user
