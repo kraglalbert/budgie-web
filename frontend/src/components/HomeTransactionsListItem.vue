@@ -5,11 +5,18 @@
   >
     <q-card-section>
       <div class="space text">
-        <strong>{{ transactionName }}</strong>
+        <strong>{{ transactionName }}</strong> - {{ transactionSource }}
         <span style="float: right;">
           <q-badge
+            v-if="amountNum >= 0"
             outline
             color="positive"
+            :label="amount"
+          />
+          <q-badge
+            v-else
+            outline
+            color="negative"
             :label="amount"
           />
         </span>
@@ -27,7 +34,9 @@ export default {
 
   props: {
     transactionName: String,
+    transactionSource: String,
     amount: String,
+    amountNum: Number,
     transactionDate: String
   }
 }

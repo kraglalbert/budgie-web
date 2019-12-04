@@ -13,13 +13,20 @@
       id="new-button"
       color="primary"
       label="Add New"
+      @click="showNewTransactionDialog = true"
     />
+
+    <q-dialog v-model="showNewTransactionDialog">
+      <HomeNewTransactionPopup @dialog-closed="showNewTransactionDialog=false" />
+    </q-dialog>
 
     <HomeTransactionsListItem
       v-for="t in transactions"
       :key="t.id"
       :transactionName="t.title"
+      :transactionSource="t.source"
       :amount="getFormattedDollarAmount(t.amount)"
+      :amountNum="t.amount"
       :transactionDate="getFormattedDate(t.date)"
     />
   </q-card>
@@ -28,18 +35,21 @@
 <script>
 import moment from 'moment'
 import HomeTransactionsListItem from './HomeTransactionsListItem.vue'
+import HomeNewTransactionPopup from './HomeNewTransactionPopup.vue'
 
 export default {
   name: 'HomeTransactionsList',
 
   components: {
-    HomeTransactionsListItem
+    HomeTransactionsListItem,
+    HomeNewTransactionPopup
   },
   data () {
     return {
       transactions: [],
       month: 0,
-      year: 0
+      year: 0,
+      showNewTransactionDialog: false
     }
   },
   created: function () {
@@ -66,7 +76,7 @@ export default {
       })
     },
     getFormattedDate (date) {
-      return moment((new Date(date))).format('MMMM Do, YYYY')
+      return moment(date).utc().format('MMMM Do, YYYY')
     }
   }
 }
@@ -90,6 +100,7 @@ h6 {
   width: 100%;
   min-width: 225px;
   margin-top: 25px;
+  margin-bottom: 25px;
   margin-right: 10px;
 }
 </style>
