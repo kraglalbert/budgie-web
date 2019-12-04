@@ -19,6 +19,34 @@
             color="negative"
             :label="amount"
           />
+          <q-btn
+            flat
+            dense
+            round
+            icon="more_vert"
+            aria-label="Edit"
+            style="margin-left: 5px"
+          >
+            <q-menu>
+              <q-list style="min-width: 100px">
+                <q-item
+                  clickable
+                  v-close-popup
+                >
+                  <q-item-section>Edit</q-item-section>
+                </q-item>
+                <q-separator />
+                <q-item
+                  clickable
+                  v-close-popup
+                >
+                  <q-item-section>
+                    <div id="remove-button">Remove</div>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
         </span>
       </div>
       <div class="space text">
@@ -45,5 +73,9 @@ export default {
 <style lang="scss" scoped>
 #container:hover {
   background-color: $highlight;
+}
+
+#remove-button {
+  color: $negative;
 }
 </style>
