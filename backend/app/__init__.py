@@ -11,7 +11,12 @@ login_manager = LoginManager()
 
 def create_app(config_name):
     app = Flask(__name__)
-    CORS(app, resources={r"/*": {"origins": r"http://localhost:*"}})
+    CORS(
+        app,
+        resources={
+            r"/*": {"origins": [r"http://localhost:*", r"http://192.168.0.11:*"]}
+        },
+    )
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
