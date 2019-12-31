@@ -14,8 +14,8 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
-    # amount in cents
-    monthly_budget = db.Column(db.Integer)
+    monthly_budget = db.Column(db.Integer)  # amount in cents
+    default_currency = db.Column(db.String(3))  # 3-letter currency code
     transactions = db.relationship("Transaction", backref="users", lazy=True)
     transactions_months = db.relationship(
         "TransactionMonth", backref="users", lazy=True
@@ -65,6 +65,9 @@ class User(UserMixin, db.Model):
             "monthly_budget": self.monthly_budget
             if self.monthly_budget is not None
             else 0,
+            "default_currency": self.default_currency
+            if self.default_currency is not None
+            else "",
             "transactions": Transaction.serialize_list(self.transactions),
             "email": self.email,
         }

@@ -91,7 +91,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
             # get transactions for user by date, wrong date
             resp = c.get("/transactions/user/{}?year=2019&month=10".format(user.id))
             json_data = resp.get_json()
-            self.assertEqual(resp.status_code, 400)
+            self.assertEqual(json_data, [])
 
             # get transactions for user by date, bad format
             resp = c.get("/transactions/user/{}?month=10".format(user.id))

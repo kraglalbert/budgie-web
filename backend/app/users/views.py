@@ -1,4 +1,5 @@
 import datetime
+import re
 from flask import Flask, jsonify, request, abort, make_response
 from flask_login import login_required, current_user
 from sqlalchemy import extract
@@ -34,21 +35,34 @@ def get_user_by_email(email):
     return jsonify(user.serialize)
 
 
-# set a user's monthly budget
-@users.route("/<int:user_id>/set-budget", methods=["PUT"])
+# update a user's settings (monthly budget, default currency)
+@users.route("/<int:user_id>/settings", methods=["PUT"])
 @login_required
-def update_user_budget(user_id):
+def update_user_settings(user_id):
     data = request.get_json(force=True)
-    monthly_budget = int(data.get("monthly_budget"))
+
+    try:
+        monthly_budget = int(data.get("monthly_budget"))
+    except TypeError:
+        monthly_budget = None
+
+    default_currency = data.get("default_currency")
+
+    if monthly_budget is None or default_currency is None:
+        abort(400, "Must give values for monthly budget and default currency")
 
     if monthly_budget < 0:
         abort(400, "Monthly budget cannot be negative")
+
+    if len(default_currency) != 3 or re.match("[A-Z]{3}", default_currency) is None:
+        abort(400, "Default currency must be in 3-letter currency code format")
 
     user = User.query.filter_by(id=user_id).first()
     if user == None:
         abort(404, "No user found with specified ID")
 
     user.monthly_budget = monthly_budget
+    user.default_currency = default_currency
 
     db.session.add(user)
     db.session.commit()

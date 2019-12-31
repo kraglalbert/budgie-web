@@ -54,6 +54,30 @@ class ModelTest(unittest.TestCase):
         user = User.query.filter_by(email="jdoe@gmail.com").first()
         self.assertTrue(user is None)
 
+    def test_user_default_currency(self):
+        user = User(
+            name="John Doe",
+            email="jdoe@gmail.com",
+            password="goodpass",
+            default_currency="CAD",
+            monthly_budget=50000,
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        user = User.query.filter_by(email="jdoe@gmail.com").first()
+        self.assertTrue(user.default_currency == "CAD")
+
+        # attempt to set invalid currency
+        try:
+            user.default_currency = "AAAAA"
+            db.session.add(user)
+            db.session.commit()
+        except:
+            return
+
+        self.fail()
+
     def test_create_transaction_month(self):
         # create test user
         user = User(
