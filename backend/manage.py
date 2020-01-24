@@ -30,6 +30,12 @@ def test():
 
 
 @manager.command
+def behave():
+    """Run the behave tests."""
+    os.system("behave")
+
+
+@manager.command
 def recreate_db():
     db.drop_all()
     db.create_all()

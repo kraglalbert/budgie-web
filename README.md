@@ -32,5 +32,10 @@ To run tests:
 python manage.py test
 ```
 
+To run acceptance tests with `behave`:
+```
+python manage.py behave
+```
+
 A `.env` file is required to define all necessary environment variables. The file should at minimum set `FLASK_CONFIG`, `DEV_DATABASE_URL`, `TEST_DATABASE_URL` and `SECRET_KEY`.
 
