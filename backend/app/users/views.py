@@ -20,7 +20,7 @@ def get_all_users():
 @login_required
 def get_user_by_id(user_id):
     user = User.query.filter_by(id=user_id).first()
-    if user == None:
+    if user is None:
         abort(404, "No user found with specified ID")
     return jsonify(user.serialize)
 
@@ -30,7 +30,7 @@ def get_user_by_id(user_id):
 @login_required
 def get_user_by_email(email):
     user = User.query.filter_by(email=email).first()
-    if user == None:
+    if user is None:
         abort(404, "No user found with specified email")
     return jsonify(user.serialize)
 
@@ -58,7 +58,7 @@ def update_user_settings(user_id):
         abort(400, "Default currency must be in 3-letter currency code format")
 
     user = User.query.filter_by(id=user_id).first()
-    if user == None:
+    if user is None:
         abort(404, "No user found with specified ID")
 
     user.monthly_budget = monthly_budget

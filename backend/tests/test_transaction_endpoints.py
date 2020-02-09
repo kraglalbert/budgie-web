@@ -34,7 +34,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
             self.assertEqual(resp.status_code, 200)
 
             resp = c.post(
-                "/transactions/create",
+                "/transactions",
                 json={
                     "title": TITLE,
                     "source": SOURCE,
@@ -109,7 +109,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
 
             # create with invalid date
             resp = c.post(
-                "/transactions/create",
+                "/transactions",
                 json={
                     "title": TITLE,
                     "source": SOURCE,
@@ -124,7 +124,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
 
             # create with empty fields
             resp = c.post(
-                "/transactions/create",
+                "/transactions",
                 json={
                     "title": "",
                     "source": "",
@@ -147,7 +147,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
             self.assertEqual(resp.status_code, 200)
 
             resp = c.post(
-                "/transactions/create",
+                "/transactions",
                 json={
                     "title": TITLE,
                     "source": SOURCE,
@@ -168,7 +168,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
             json_data["month"] = 1
             json_data["day"] = 31
 
-            resp = c.put("/transactions/update/{}".format(t_id), json=json_data)
+            resp = c.put("/transactions/{}".format(t_id), json=json_data)
             self.assertEqual(resp.status_code, 200)
             json_data = resp.get_json()
             self.assertEqual(json_data["title"], "New Car")
@@ -188,7 +188,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
             self.assertEqual(resp.status_code, 200)
 
             resp = c.post(
-                "/transactions/create",
+                "/transactions",
                 json={
                     "title": TITLE,
                     "source": SOURCE,
@@ -204,9 +204,9 @@ class TransactionsIntegrationTest(unittest.TestCase):
             t_id = json_data["id"]
 
             # delete existing transaction
-            resp = c.delete("/transactions/delete/{}".format(t_id))
+            resp = c.delete("/transactions/{}".format(t_id))
             self.assertEqual(resp.status_code, 200)
 
             # try deleting non-existent transaction
-            resp = c.delete("/transactions/delete/{}".format(t_id))
+            resp = c.delete("/transactions/{}".format(t_id))
             self.assertEqual(resp.status_code, 404)

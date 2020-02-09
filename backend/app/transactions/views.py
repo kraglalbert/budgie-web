@@ -113,7 +113,7 @@ def get_transaction(id):
 
 
 # create new transaction
-@transactions.route("/create", methods=["POST"])
+@transactions.route("", methods=["POST"])
 @login_required
 def create_transaction():
     data = request.get_json(force=True)
@@ -175,7 +175,7 @@ def create_transaction():
 
 
 # update a transaction by ID
-@transactions.route("/update/<int:id>", methods=["PUT"])
+@transactions.route("/<int:id>", methods=["PUT"])
 @login_required
 def update_transaction(id):
     data = request.get_json(force=True)
@@ -218,11 +218,11 @@ def update_transaction(id):
 
 
 # delete a transaction by ID
-@transactions.route("/delete/<int:id>", methods=["DELETE"])
+@transactions.route("/<int:id>", methods=["DELETE"])
 @login_required
 def delete_transaction(id):
     t = Transaction.query.filter_by(id=id).first()
-    if t == None:
+    if t is None:
         abort(404, "No transaction found with specified ID")
 
     db.session.delete(t)
