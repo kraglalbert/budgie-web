@@ -1,12 +1,12 @@
 from flask import Flask
-from flask_login import LoginManager
 from flask_cors import CORS
+from flask_httpauth import HTTPTokenAuth
 from flask_sqlalchemy import SQLAlchemy
 
 from config import config
 
 db = SQLAlchemy()
-login_manager = LoginManager()
+http_auth = HTTPTokenAuth("Bearer")
 
 
 def create_app(config_name):
@@ -22,16 +22,15 @@ def create_app(config_name):
 
     # call init_app to complete initialization
     db.init_app(app)
-    login_manager.init_app(app)
 
     # create app blueprints
     from .main import main as main_blueprint
 
     app.register_blueprint(main_blueprint)
 
-    from .account import account as account_blueprint
+    from .auth import auth as auth_blueprint
 
-    app.register_blueprint(account_blueprint, url_prefix="/account")
+    app.register_blueprint(auth_blueprint, url_prefix="/auth")
 
     from .users import users as users_blueprint
 

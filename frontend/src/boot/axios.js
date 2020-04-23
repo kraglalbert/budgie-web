@@ -9,5 +9,8 @@ const backendUrl = config.build.backendHost + ':' + config.build.backendPort
 
 Vue.prototype.$axios = axios.create({
   baseURL: backendUrl,
-  headers: { 'Access-Control-Allow-Origin': frontendUrl, 'Content-Type': 'application/json' }
+  headers: {
+    'Access-Control-Allow-Origin': frontendUrl,
+    'Content-Type': 'application/json'
+  }
 })

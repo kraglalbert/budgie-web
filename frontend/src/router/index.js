@@ -15,7 +15,10 @@ const backendUrl = config.build.backendHost + ':' + config.build.backendPort
 
 var AXIOS = axios.create({
   baseURL: backendUrl,
-  headers: { 'Access-Control-Allow-Origin': frontendUrl, 'Content-Type': 'application/json' }
+  headers: {
+    'Access-Control-Allow-Origin': frontendUrl,
+    'Content-Type': 'application/json'
+  }
 })
 
 /*
@@ -54,13 +57,12 @@ export default function (/* { store, ssrContext } */) {
           })
           .catch(() => {
             // token is invalid
-            Store.dispatch('logout')
-              .then(
-                next({
-                  path: '/login',
-                  query: { redirect: to.fullPath }
-                })
-              )
+            Store.dispatch('logout').then(
+              next({
+                path: '/login',
+                query: { redirect: to.fullPath }
+              })
+            )
             next()
           })
       } else {

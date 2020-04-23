@@ -1,13 +1,18 @@
 import datetime
 from flask import Flask, jsonify, request, abort, make_response
-from flask_login import current_user, login_required, login_user, logout_user
-from . import account
+from . import auth
 from .. import db
 from app.models import User, Transaction, TransactionMonth
 
 # log in an existing user
-@account.route("/login", methods=["POST"])
+@auth.route("/login", methods=["POST"])
 def login():
+    """
+    Required in body:
+
+    email: String
+    password: String
+    """
     data = request.get_json(force=True)
     email = data.get("email")
     password = data.get("password")
@@ -18,15 +23,19 @@ def login():
         and user.password_hash is not None
         and user.verify_password(password)
     ):
-        login_user(user)
         token = user.generate_auth_token()
         return jsonify({"user": user.serialize, "token": token.decode("ascii")})
     return "Wrong email or password!", 400
 
 
 # check if token is valid and return user
-@account.route("/token", methods=["POST"])
+@auth.route("/token", methods=["POST"])
 def verify_token():
+    """
+    Required in body:
+
+    token: String
+    """
     data = request.get_json(force=True)
     token = data.get("token")
 
@@ -38,8 +47,15 @@ def verify_token():
 
 
 # register a new user
-@account.route("/register", methods=["POST"])
+@auth.route("/register", methods=["POST"])
 def register():
+    """
+    Required in body:
+
+    name: String
+    email: String
+    password: String
+    """
     data = request.get_json(force=True)
     name = data.get("name")
     email = data.get("email")
@@ -59,8 +75,8 @@ def register():
 
 
 # log out an existing user
-@account.route("/logout")
+@auth.route("/logout")
 @login_required
 def logout():
-    logout_user()
-    return "Logged out successfully!", 200
+    # TODO: maybe implement this?
+    return "Logged out successfully", 200

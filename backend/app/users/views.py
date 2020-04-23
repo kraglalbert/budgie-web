@@ -1,15 +1,14 @@
 import datetime
 import re
 from flask import Flask, jsonify, request, abort, make_response
-from flask_login import login_required, current_user
 from sqlalchemy import extract
 from . import users
-from .. import db
+from .. import db, http_auth
 from app.models import User, Transaction, TransactionMonth
 
 # get all users
 @users.route("", methods=["GET"])
-@login_required
+@http_auth.login_required
 def get_all_users():
     users = User.query.all()
     return jsonify(User.serialize_list(users))
@@ -17,7 +16,7 @@ def get_all_users():
 
 # get user by ID
 @users.route("/<int:user_id>", methods=["GET"])
-@login_required
+@http_auth.login_required
 def get_user_by_id(user_id):
     user = User.query.filter_by(id=user_id).first()
     if user is None:
@@ -27,7 +26,7 @@ def get_user_by_id(user_id):
 
 # get user by email
 @users.route("/<email>", methods=["GET"])
-@login_required
+@http_auth.login_required
 def get_user_by_email(email):
     user = User.query.filter_by(email=email).first()
     if user is None:
@@ -37,7 +36,7 @@ def get_user_by_email(email):
 
 # update a user's settings (monthly budget, default currency)
 @users.route("/<int:user_id>/settings", methods=["PUT"])
-@login_required
+@http_auth.login_required
 def update_user_settings(user_id):
     data = request.get_json(force=True)
 
