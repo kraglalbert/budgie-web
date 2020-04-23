@@ -5,7 +5,7 @@ from app.models import User
 from app import create_app, db
 
 
-class AccountIntegrationTest(unittest.TestCase):
+class AuthIntegrationTest(unittest.TestCase):
     def setUp(self):
         self.app = create_app("testing")
         self.app_context = self.app.app_context()
@@ -20,7 +20,7 @@ class AccountIntegrationTest(unittest.TestCase):
     def test_register_and_get_user(self):
         with self.app.test_client() as c:
             resp = c.post(
-                "/account/register",
+                "/auth/register",
                 json={
                     "name": "John Doe",
                     "email": "jdoe@gmail.com",
@@ -31,13 +31,17 @@ class AccountIntegrationTest(unittest.TestCase):
 
             # log in user
             resp = c.post(
-                "/account/login",
-                json={"email": "jdoe@gmail.com", "password": "secret"},
+                "/auth/login", json={"email": "jdoe@gmail.com", "password": "secret"},
             )
             self.assertEqual(resp.status_code, 200)
+            json_data = resp.get_json()
+            token = json_data["token"]
 
             # get user by username
-            resp = c.get("/users/jdoe@gmail.com")
+            resp = c.get(
+                "/users/jdoe@gmail.com",
+                headers={"Authorization": "Bearer {}".format(token)},
+            )
             self.assertEqual(resp.status_code, 200)
 
             json_data = resp.get_json()
@@ -46,5 +50,8 @@ class AccountIntegrationTest(unittest.TestCase):
 
             # get user by ID
             user_id = json_data["id"]
-            resp = c.get("/users/{}".format(user_id))
+            resp = c.get(
+                "/users/{}".format(user_id),
+                headers={"Authorization": "Bearer {}".format(token)},
+            )
             self.assertEqual(resp.status_code, 200)

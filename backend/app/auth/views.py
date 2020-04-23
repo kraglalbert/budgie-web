@@ -1,7 +1,7 @@
 import datetime
 from flask import Flask, jsonify, request, abort, make_response
 from . import auth
-from .. import db
+from .. import db, http_auth
 from app.models import User, Transaction, TransactionMonth
 
 # log in an existing user
@@ -76,7 +76,7 @@ def register():
 
 # log out an existing user
 @auth.route("/logout")
-@login_required
+@http_auth.login_required
 def logout():
     # TODO: maybe implement this?
     return "Logged out successfully", 200
