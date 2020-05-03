@@ -2,21 +2,26 @@
   <div id="container" class="q-pl-md q-pr-md q-pb-sm q-pt-sm">
     <div class="row">
       <div class="col-9">
-        <div class="text-body2 text-weight-medium">{{ transactionName }}</div>
-        <div class="text-body2">{{ transactionSource }}</div>
+        <div class="text-body2 text-weight-medium">{{ transaction.title }}</div>
+        <div class="text-body2">{{ transaction.source }}</div>
         <div class="text-caption">
-          {{ transactionDate }}
+          {{ getFormattedDate(transaction.date) }}
         </div>
       </div>
       <div class="col-3">
         <div class="float-right">
           <q-badge
-            v-if="amountNum >= 0"
+            v-if="transaction.amount >= 0"
             outline
             color="positive"
-            :label="amount"
+            :label="transaction.amount"
           />
-          <q-badge v-else outline color="negative" :label="amount" />
+          <q-badge
+            v-else
+            outline
+            color="negative"
+            :label="getFormattedDollarAmount(transaction.amount)"
+          />
           <q-btn
             flat
             dense
@@ -31,7 +36,7 @@
                   <q-item-section>Edit</q-item-section>
                 </q-item>
                 <q-separator />
-                <q-item clickable v-close-popup>
+                <q-item clickable v-close-popup @click="deleteTransaction">
                   <q-item-section>
                     <div id="remove-button">Remove</div>
                   </q-item-section>
@@ -49,11 +54,39 @@
 export default {
   name: 'HomeTransactionsListItem',
   props: {
-    transactionName: String,
-    transactionSource: String,
-    amount: String,
-    amountNum: Number,
-    transactionDate: String
+    transaction: {
+      type: Object,
+      required: true
+    }
+  },
+  methods: {
+    deleteTransaction: function () {
+      this.$axios
+        .delete(`/transactions/${this.transaction.id}`, {
+          headers: {
+            Authorization: `Bearer ${this.$store.state.token}`
+          }
+        })
+        .then(_resp => {
+          this.$q.notify({
+            color: 'green-4',
+            position: 'top',
+            textColor: 'white',
+            icon: 'cloud_done',
+            message: 'Transaction Deleted Successfully'
+          })
+          this.$emit('refresh')
+        })
+        .catch(_err => {
+          this.$q.notify({
+            color: 'red-4',
+            position: 'top',
+            textColor: 'white',
+            icon: 'error',
+            message: 'Something went wrong, please try again'
+          })
+        })
+    }
   }
 }
 </script>

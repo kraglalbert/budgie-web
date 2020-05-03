@@ -22,18 +22,15 @@
     <div v-if="loading" class="text-center q-ma-md">
       <q-spinner color="primary" size="3em" />
     </div>
-    <div v-else-if="transactions.length === 0" class="text-center">
+    <div v-else-if="transactions.length === 0" class="text-center q-ma-md">
       No transactions to show.
     </div>
     <div v-else>
       <HomeTransactionsListItem
         v-for="t in transactions"
         :key="t.id"
-        :transactionName="t.title"
-        :transactionSource="t.source"
-        :amount="getFormattedDollarAmount(t.amount)"
-        :amountNum="t.amount"
-        :transactionDate="getFormattedDate(t.date)"
+        :transaction="t"
+        @refresh="getTransactionsForCurrentMonth"
       />
     </div>
   </q-card>
@@ -86,11 +83,6 @@ export default {
           this.transactions = resp.data.sort(this.compareTransactionDates)
           this.loading = false
         })
-    },
-    getFormattedDate: function (date) {
-      return moment(date)
-        .utc()
-        .format('MMMM Do, YYYY')
     }
   }
 }

@@ -1,7 +1,13 @@
 import Vue from 'vue'
+import moment from 'moment'
 
 Vue.mixin({
   methods: {
+    getFormattedDate: function (date) {
+      return moment(date)
+        .utc()
+        .format('MMMM Do, YYYY')
+    },
     getFormattedDollarAmount: function (amount) {
       let dollarAmount = amount / 100.0
       if (dollarAmount >= 0) {
