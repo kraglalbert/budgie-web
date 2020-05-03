@@ -22,6 +22,9 @@
     <div v-if="loading" class="text-center q-ma-md">
       <q-spinner color="primary" size="3em" />
     </div>
+    <div v-else-if="transactions.length === 0" class="text-center">
+      No transactions to show.
+    </div>
     <div v-else>
       <HomeTransactionsListItem
         v-for="t in transactions"
@@ -80,7 +83,7 @@ export default {
           }
         })
         .then(resp => {
-          this.transactions = resp.data
+          this.transactions = resp.data.sort(this.compareTransactionDates)
           this.loading = false
         })
     },
