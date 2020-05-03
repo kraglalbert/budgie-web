@@ -14,9 +14,7 @@
     />
 
     <q-dialog v-model="showNewTransactionDialog">
-      <HomeNewTransactionPopup
-        @transaction-created="getTransactionsForCurrentMonth"
-      />
+      <HomeNewTransactionPopup @transaction-created="notifyParentToRefresh" />
     </q-dialog>
 
     <div v-if="loading" class="text-center q-ma-md">
@@ -30,7 +28,7 @@
         v-for="t in transactions"
         :key="t.id"
         :transaction="t"
-        @refresh="getTransactionsForCurrentMonth"
+        @refresh="notifyParentToRefresh"
       />
     </div>
   </q-card>
@@ -47,42 +45,25 @@ export default {
     HomeTransactionsListItem,
     HomeNewTransactionPopup
   },
+  props: {
+    transactions: {
+      type: Array,
+      required: true
+    },
+    loading: {
+      type: Boolean,
+      required: true
+    }
+  },
   data: function () {
     return {
-      loading: true,
-      transactions: [],
-      month: 0,
-      year: 0,
       showNewTransactionDialog: false
     }
   },
-  created: function () {
-    const currentDate = new Date()
-    this.month = currentDate.getMonth()
-    this.year = currentDate.getFullYear()
-
-    this.getTransactionsForCurrentMonth()
-  },
   methods: {
-    getTransactionsForCurrentMonth: function () {
+    notifyParentToRefresh: function () {
       this.showNewTransactionDialog = false
-      this.loading = true
-
-      const user = this.$store.state.currentUser
-      this.$axios
-        .get('/transactions/user/' + user.id, {
-          params: {
-            month: this.month + 1,
-            year: this.year
-          },
-          headers: {
-            Authorization: `Bearer ${this.$store.state.token}`
-          }
-        })
-        .then(resp => {
-          this.transactions = resp.data.sort(this.compareTransactionDates)
-          this.loading = false
-        })
+      this.$emit('refresh')
     }
   }
 }

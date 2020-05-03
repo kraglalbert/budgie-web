@@ -14,7 +14,7 @@
             v-if="transaction.amount >= 0"
             outline
             color="positive"
-            :label="transaction.amount"
+            :label="getFormattedDollarAmount(transaction.amount)"
           />
           <q-badge
             v-else

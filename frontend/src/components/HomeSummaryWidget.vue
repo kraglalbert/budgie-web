@@ -40,64 +40,44 @@
 
 <script>
 export default {
-  data: function () {
-    return {
-      loading: true,
-      month: 0,
-      year: 0,
-      amountSpent: '',
-      amountEarned: '',
-      remainingBudget: ''
+  name: 'HomeSummaryWidget',
+  props: {
+    transactions: {
+      type: Array,
+      required: true
+    },
+    loading: {
+      type: Boolean,
+      required: true
     }
   },
-  created: function () {
-    const currentDate = new Date()
-    this.month = currentDate.getMonth()
-    this.year = currentDate.getFullYear()
-
-    this.getTransactionsForCurrentMonth()
+  data: function () {
+    return {}
   },
-  methods: {
-    getTransactionsForCurrentMonth: function () {
+  computed: {
+    amountSpent: function () {
+      var spent = 0
+      this.transactions.forEach(t => {
+        if (t.amount < 0) {
+          spent += Math.abs(t.amount)
+        }
+      })
+      return this.getFormattedDollarAmount(spent)
+    },
+    amountEarned: function () {
+      var earned = 0
+      this.transactions.forEach(t => {
+        if (t.amount > 0) {
+          earned += t.amount
+        }
+      })
+      return this.getFormattedDollarAmount(earned)
+    },
+    remainingBudget: function () {
       const user = this.$store.state.currentUser
-
-      this.$axios
-        .get('/transactions/user/' + user.id, {
-          params: {
-            month: this.month + 1,
-            year: this.year
-          },
-          headers: {
-            Authorization: `Bearer ${this.$store.state.token}`
-          }
-        })
-        .then(resp => {
-          const transactions = resp.data
-
-          var spent = 0
-          var earned = 0
-
-          transactions.forEach(t => {
-            if (t.amount < 0) {
-              spent += Math.abs(t.amount)
-            } else {
-              earned += t.amount
-            }
-          })
-
-          const userBudget = user.monthly_budget
-          this.amountSpent = this.getFormattedDollarAmount(spent)
-          this.amountEarned = this.getFormattedDollarAmount(earned)
-          this.remainingBudget =
-            userBudget === 0
-              ? 'N/A'
-              : this.getFormattedDollarAmount(userBudget - spent)
-
-          this.loading = false
-        })
-        .catch(_err => {
-          this.loading = false
-        })
+      return user.monthly_budget === 0
+        ? 'N/A'
+        : this.getFormattedDollarAmount(user.user_budget - this.amountSpent)
     }
   }
 }

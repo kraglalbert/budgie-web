@@ -74,7 +74,18 @@
           </template>
         </q-input>
 
-        <q-btn color="primary" type="submit" label="Add" />
+        <q-btn
+          color="primary"
+          type="submit"
+          label="Add"
+          :disabled="submitting"
+        />
+        <q-spinner
+          v-if="submitting"
+          color="primary"
+          size="2.5em"
+          class="q-ml-md"
+        />
       </q-form>
     </q-card-section>
   </q-card>
@@ -87,6 +98,7 @@ export default {
   name: 'HomeNewTransactionPopup',
   data: function () {
     return {
+      submitting: false,
       transactionType: 'spending',
       transactionDate: moment(new Date()).format('YYYY/MM/DD'),
       transactionTitle: '',
@@ -96,15 +108,17 @@ export default {
   },
   methods: {
     createTransaction: function () {
+      this.submitting = true
+
       const user = this.$store.state.currentUser
       let amount = parseFloat(this.transactionAmount) * 100
       if (this.transactionType === 'spending') {
-        amount = amount * -1
+        amount = -1 * amount
       }
 
       const date = new Date(this.transactionDate)
 
-      const data = {
+      const body = {
         title: this.transactionTitle,
         source: this.transactionSource,
         amount: amount,
@@ -115,7 +129,7 @@ export default {
       }
 
       this.$axios
-        .post('/transactions', data, {
+        .post('/transactions', body, {
           headers: {
             Authorization: `Bearer ${this.$store.state.token}`
           }
@@ -128,6 +142,7 @@ export default {
             icon: 'cloud_done',
             message: 'Transaction Added Successfully'
           })
+          this.submitting = false
           // let parent know to close the dialog
           this.$emit('transaction-created')
         })
@@ -139,6 +154,7 @@ export default {
             icon: 'error',
             message: 'Something went wrong, please try again'
           })
+          this.submitting = false
         })
     }
   }
