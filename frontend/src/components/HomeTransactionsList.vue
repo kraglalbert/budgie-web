@@ -1,8 +1,5 @@
 <template>
-  <q-card
-    bordered
-    id="card"
-  >
+  <q-card bordered id="card">
     <q-card-section>
       <div class="text-h6">Transactions This Month</div>
     </q-card-section>
@@ -17,18 +14,25 @@
     />
 
     <q-dialog v-model="showNewTransactionDialog">
-      <HomeNewTransactionPopup @dialog-closed="showNewTransactionDialog=false" />
+      <HomeNewTransactionPopup
+        @transaction-created="getTransactionsForCurrentMonth"
+      />
     </q-dialog>
 
-    <HomeTransactionsListItem
-      v-for="t in transactions"
-      :key="t.id"
-      :transactionName="t.title"
-      :transactionSource="t.source"
-      :amount="getFormattedDollarAmount(t.amount)"
-      :amountNum="t.amount"
-      :transactionDate="getFormattedDate(t.date)"
-    />
+    <div v-if="loading" class="text-center q-ma-md">
+      <q-spinner color="primary" size="3em" />
+    </div>
+    <div v-else>
+      <HomeTransactionsListItem
+        v-for="t in transactions"
+        :key="t.id"
+        :transactionName="t.title"
+        :transactionSource="t.source"
+        :amount="getFormattedDollarAmount(t.amount)"
+        :amountNum="t.amount"
+        :transactionDate="getFormattedDate(t.date)"
+      />
+    </div>
   </q-card>
 </template>
 
@@ -39,13 +43,13 @@ import HomeNewTransactionPopup from './HomeNewTransactionPopup.vue'
 
 export default {
   name: 'HomeTransactionsList',
-
   components: {
     HomeTransactionsListItem,
     HomeNewTransactionPopup
   },
-  data () {
+  data: function () {
     return {
+      loading: true,
       transactions: [],
       month: 0,
       year: 0,
@@ -60,33 +64,36 @@ export default {
     this.getTransactionsForCurrentMonth()
   },
   methods: {
-    getTransactionsForCurrentMonth () {
-      const user = this.$store.state.currentUser
+    getTransactionsForCurrentMonth: function () {
+      this.showNewTransactionDialog = false
+      this.loading = true
 
-      this.$axios.get('/transactions/user/' + user.id, {
-        params: {
-          month: this.month + 1,
-          year: this.year
-        },
-        headers: {
-          'Authorization': this.$store.state.token
-        }
-      }).then(resp => {
-        this.transactions = resp.data
-      })
+      const user = this.$store.state.currentUser
+      this.$axios
+        .get('/transactions/user/' + user.id, {
+          params: {
+            month: this.month + 1,
+            year: this.year
+          },
+          headers: {
+            Authorization: `Bearer ${this.$store.state.token}`
+          }
+        })
+        .then(resp => {
+          this.transactions = resp.data
+          this.loading = false
+        })
     },
-    getFormattedDate (date) {
-      return moment(date).utc().format('MMMM Do, YYYY')
+    getFormattedDate: function (date) {
+      return moment(date)
+        .utc()
+        .format('MMMM Do, YYYY')
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-h6 {
-  margin: 10px;
-}
-
 .space {
   margin-top: 5px;
   margin-bottom: 5px;

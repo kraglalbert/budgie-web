@@ -1,15 +1,18 @@
 <template>
-  <q-card
-    bordered
-    id="card"
-  >
+  <q-card bordered id="card">
     <q-card-section>
       <div class="text-h6">Monthly Summary</div>
     </q-card-section>
 
     <q-separator inset />
 
-    <q-card-section>
+    <q-card-section v-if="loading">
+      <div class="text-center">
+        <q-spinner color="primary" size="3em" />
+      </div>
+    </q-card-section>
+
+    <q-card-section v-else>
       <div class="space text">
         Spent:
         <span style="float: right;">
@@ -29,22 +32,17 @@
         </span>
       </div>
       <div class="row justify-center">
-        <q-btn
-          flat
-          color="primary"
-          label="More Info"
-          :size="'sm'"
-        />
+        <q-btn flat color="primary" label="More Info" :size="'sm'" />
       </div>
-
     </q-card-section>
   </q-card>
 </template>
 
 <script>
 export default {
-  data () {
+  data: function () {
     return {
+      loading: true,
       month: 0,
       year: 0,
       amountSpent: '',
@@ -60,46 +58,52 @@ export default {
     this.getTransactionsForCurrentMonth()
   },
   methods: {
-    getTransactionsForCurrentMonth () {
+    getTransactionsForCurrentMonth: function () {
       const user = this.$store.state.currentUser
 
-      this.$axios.get('/transactions/user/' + user.id, {
-        params: {
-          month: this.month + 1,
-          year: this.year
-        },
-        headers: {
-          'Authorization': this.$store.state.token
-        }
-      }).then(resp => {
-        const transactions = resp.data
-
-        var spent = 0
-        var earned = 0
-
-        transactions.forEach(t => {
-          if (t.amount < 0) {
-            spent += Math.abs(t.amount)
-          } else {
-            earned += t.amount
+      this.$axios
+        .get('/transactions/user/' + user.id, {
+          params: {
+            month: this.month + 1,
+            year: this.year
+          },
+          headers: {
+            Authorization: `Bearer ${this.$store.state.token}`
           }
         })
+        .then(resp => {
+          const transactions = resp.data
 
-        const userBudget = user.monthly_budget
-        this.amountSpent = this.getFormattedDollarAmount(spent)
-        this.amountEarned = this.getFormattedDollarAmount(earned)
-        this.remainingBudget = userBudget === 0 ? 'N/A' : this.getFormattedDollarAmount(userBudget - spent)
-      })
+          var spent = 0
+          var earned = 0
+
+          transactions.forEach(t => {
+            if (t.amount < 0) {
+              spent += Math.abs(t.amount)
+            } else {
+              earned += t.amount
+            }
+          })
+
+          const userBudget = user.monthly_budget
+          this.amountSpent = this.getFormattedDollarAmount(spent)
+          this.amountEarned = this.getFormattedDollarAmount(earned)
+          this.remainingBudget =
+            userBudget === 0
+              ? 'N/A'
+              : this.getFormattedDollarAmount(userBudget - spent)
+
+          this.loading = false
+        })
+        .catch(_err => {
+          this.loading = false
+        })
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-h6 {
-  margin: 10px;
-}
-
 .space {
   margin-top: 5px;
   margin-bottom: 5px;

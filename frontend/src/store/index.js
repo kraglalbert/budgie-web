@@ -10,12 +10,14 @@ var config = require('../config')
 
 // Axios config
 const frontendUrl = config.build.host + ':' + config.build.port
-const backendUrl =
-  config.build.backendHost + ':' + config.build.backendPort
+const backendUrl = config.build.backendHost + ':' + config.build.backendPort
 
 var AXIOS = axios.create({
   baseURL: backendUrl,
-  headers: { 'Access-Control-Allow-Origin': frontendUrl, 'Content-Type': 'application/json' }
+  headers: {
+    'Access-Control-Allow-Origin': frontendUrl,
+    'Content-Type': 'application/json'
+  }
 })
 
 /*
@@ -62,13 +64,15 @@ const Store = new Vuex.Store({
     login ({ commit }, user) {
       return new Promise((resolve, reject) => {
         commit('auth_request')
-        AXIOS.post('/account/login', { email: user.email, password: user.password })
+        AXIOS.post('/auth/login', {
+          email: user.email,
+          password: user.password
+        })
           .then(resp => {
             const token = resp.data.token
             const user = resp.data.user
             localStorage.setItem('token', token)
 
-            axios.defaults.headers.common['Authorization'] = token
             commit('auth_success', { token, user })
             resolve(resp)
           })
@@ -82,15 +86,16 @@ const Store = new Vuex.Store({
     register ({ commit }, user) {
       return new Promise((resolve, reject) => {
         commit('auth_request')
-        AXIOS.post('/account/register', {
-          name: user.name, email: user.email, password: user.password
+        AXIOS.post('/auth/register', {
+          name: user.name,
+          email: user.email,
+          password: user.password
         })
           .then(resp => {
             const token = resp.data.token
             const user = resp.data.user
             localStorage.setItem('token', token)
 
-            axios.defaults.headers.common['Authorization'] = token
             commit('auth_success', { token, user })
             resolve(resp)
           })

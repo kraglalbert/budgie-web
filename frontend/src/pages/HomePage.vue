@@ -1,9 +1,6 @@
 <template>
   <q-page class="flex justify-center">
-    <div
-      id="container"
-      class="row"
-    >
+    <div id="container" class="row">
       <div class="col-9">
         <HomeTransactionsList />
       </div>
@@ -11,7 +8,6 @@
         <HomeSummaryWidget />
       </div>
     </div>
-
   </q-page>
 </template>
 
@@ -21,15 +17,9 @@ import HomeSummaryWidget from '../components/HomeSummaryWidget.vue'
 
 export default {
   name: 'HomePage',
-
   components: {
     HomeSummaryWidget,
     HomeTransactionsList
-  },
-  data () {
-    return {
-
-    }
   }
 }
 </script>

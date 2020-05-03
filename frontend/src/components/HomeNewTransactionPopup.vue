@@ -1,28 +1,21 @@
 <template>
-  <q-card>
+  <q-card id="container">
     <q-card-section class="row items-center">
       <div class="text-h6">Add New Transaction</div>
       <q-space />
-      <q-btn
-        icon="close"
-        flat
-        round
-        dense
-        v-close-popup
-      />
+      <q-btn icon="close" flat round dense v-close-popup />
     </q-card-section>
 
     <q-card-section>
-      <q-form
-        @submit="createTransaction"
-        class="q-gutter-sm"
-      >
+      <q-form @submit="createTransaction">
         <q-input
           filled
           v-model="transactionTitle"
           label="Transaction Title"
           lazy-rules
-          :rules="[ val => val && val.length > 0 || 'Please enter a transaction title']"
+          :rules="[
+            val => (val && val.length > 0) || 'Please enter a transaction title'
+          ]"
         />
 
         <q-input
@@ -30,7 +23,7 @@
           v-model="transactionSource"
           label="Source"
           lazy-rules
-          :rules="[ val => val && val.length > 0 || 'Please enter a source']"
+          :rules="[val => (val && val.length > 0) || 'Please enter a source']"
         />
 
         <q-input
@@ -42,37 +35,31 @@
           reverse-fill-mask
           prefix="$"
           lazy-rules
-          :rules="[ val => val !== null && val !== '' || 'Please enter the transaction amount',
-                    val => val > 0 || 'Amount cannot be negative or zero']"
+          :rules="[
+            val =>
+              (val !== null && val !== '') ||
+              'Please enter the transaction amount',
+            val => val > 0 || 'Amount cannot be negative or zero'
+          ]"
         />
 
-        <div>
-          <q-btn-toggle
-            v-model="transactionType"
-            class="my-custom-toggle"
-            no-caps
-            unelevated
-            toggle-color="primary"
-            color="white"
-            text-color="primary"
-            :options="[
-          {label: 'Spending', value: 'spending'},
-          {label: 'Profit', value: 'profit'}
-        ]"
-          />
-        </div>
+        <q-btn-toggle
+          v-model="transactionType"
+          class="q-mb-md"
+          no-caps
+          unelevated
+          toggle-color="primary"
+          color="white"
+          text-color="primary"
+          :options="[
+            { label: 'Spending', value: 'spending' },
+            { label: 'Profit', value: 'profit' }
+          ]"
+        />
 
-        <q-input
-          filled
-          v-model="transactionDate"
-          mask="date"
-          :rules="['date']"
-        >
+        <q-input filled v-model="transactionDate" mask="date" :rules="['date']">
           <template v-slot:append>
-            <q-icon
-              name="event"
-              class="cursor-pointer"
-            >
+            <q-icon name="event" class="cursor-pointer">
               <q-popup-proxy
                 ref="qDateProxy"
                 transition-show="scale"
@@ -87,11 +74,7 @@
           </template>
         </q-input>
 
-        <q-btn
-          color="primary"
-          type="submit"
-          label="Add"
-        />
+        <q-btn color="primary" type="submit" label="Add" />
       </q-form>
     </q-card-section>
   </q-card>
@@ -102,11 +85,10 @@ import moment from 'moment'
 
 export default {
   name: 'HomeNewTransactionPopup',
-
-  data () {
+  data: function () {
     return {
       transactionType: 'spending',
-      transactionDate: moment((new Date())).format('YYYY/MM/DD'),
+      transactionDate: moment(new Date()).format('YYYY/MM/DD'),
       transactionTitle: '',
       transactionSource: '',
       transactionAmount: ''
@@ -132,10 +114,10 @@ export default {
         day: date.getUTCDate()
       }
 
-      this.$axios.post('/transactions/create', data,
-        {
+      this.$axios
+        .post('/transactions', data, {
           headers: {
-            'Authorization': this.$store.state.token
+            Authorization: `Bearer ${this.$store.state.token}`
           }
         })
         .then(_resp => {
@@ -147,7 +129,7 @@ export default {
             message: 'Transaction Added Successfully'
           })
           // let parent know to close the dialog
-          this.$emit('dialog-closed')
+          this.$emit('transaction-created')
         })
         .catch(_err => {
           this.$q.notify({
@@ -162,3 +144,10 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+#container {
+  width: 30%;
+  min-width: 300px;
+}
+</style>

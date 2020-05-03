@@ -1,10 +1,11 @@
 const routes = [
   {
-    path: '', redirect: '/home'
+    path: '',
+    redirect: '/home'
   },
   {
     path: '/home',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/LoggedInLayout.vue'),
     meta: { requiresAuth: true },
     children: [{ path: '', component: () => import('pages/HomePage.vue') }]
   },

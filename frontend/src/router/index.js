@@ -50,7 +50,7 @@ export default function (/* { store, ssrContext } */) {
       } else if (Store.getters.isLoggedIn && !Store.state.userExists) {
         // get user with stored token
         const token = Store.state.token
-        AXIOS.post('/account/token', { token: token })
+        AXIOS.post('/auth/token', { token: token })
           .then(resp => {
             Store.commit('set_user', resp.data)
             next()
