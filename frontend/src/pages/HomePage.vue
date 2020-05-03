@@ -1,6 +1,6 @@
 <template>
-  <q-page class="flex justify-center">
-    <div id="container" class="row">
+  <BasePage>
+    <div class="row">
       <div class="col-9">
         <HomeTransactionsList
           :transactions="transactions"
@@ -16,16 +16,18 @@
         />
       </div>
     </div>
-  </q-page>
+  </BasePage>
 </template>
 
 <script>
+import BasePage from './BasePage.vue'
 import HomeTransactionsList from '../components/HomeTransactionsList.vue'
 import HomeSummaryWidget from '../components/HomeSummaryWidget.vue'
 
 export default {
   name: 'HomePage',
   components: {
+    BasePage,
     HomeSummaryWidget,
     HomeTransactionsList
   },
@@ -65,8 +67,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-#container {
-  width: 80%;
-}
-</style>
+<style lang="scss" scoped></style>

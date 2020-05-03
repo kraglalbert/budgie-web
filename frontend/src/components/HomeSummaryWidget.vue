@@ -32,7 +32,13 @@
         </span>
       </div>
       <div class="row justify-center">
-        <q-btn flat color="primary" label="More Info" :size="'sm'" />
+        <q-btn
+          flat
+          color="primary"
+          label="View All Months"
+          size="sm"
+          @click="goToTransactionsPage"
+        />
       </div>
     </q-card-section>
   </q-card>
@@ -78,6 +84,11 @@ export default {
       return user.monthly_budget === 0
         ? 'N/A'
         : this.getFormattedDollarAmount(user.user_budget - this.amountSpent)
+    }
+  },
+  methods: {
+    goToTransactionsPage: function () {
+      this.$router.push({ path: '/transactions' })
     }
   }
 }

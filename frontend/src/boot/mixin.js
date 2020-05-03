@@ -4,9 +4,7 @@ import moment from 'moment'
 Vue.mixin({
   methods: {
     getFormattedDate: function (date) {
-      return moment(date)
-        .utc()
-        .format('MMMM Do, YYYY')
+      return moment(date).format('MMMM Do, YYYY')
     },
     getFormattedDollarAmount: function (amount) {
       let dollarAmount = amount / 100.0
@@ -18,7 +16,10 @@ Vue.mixin({
       }
     },
     compareTransactionDates: function (t1, t2) {
-      if (t1.date < t2.date) return 1
+      var date1 = Date.parse(t1.date)
+      var date2 = Date.parse(t2.date)
+
+      if (date1 < date2) return 1
       else return -1
     }
   }

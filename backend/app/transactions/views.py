@@ -56,6 +56,33 @@ def get_transactions_for_user(user_id):
     return jsonify(Transaction.serialize_list(transactions))
 
 
+# get transaction months for user
+@transactions.route("/user/<int:user_id>/months", methods=["GET"])
+@http_auth.login_required
+def get_transaction_months_for_user(user_id):
+    transaction_months = TransactionMonth.query.filter_by(user_id=user_id,).all()
+    result = []
+
+    for t_month in transaction_months:
+        total_spent = 0
+        total_earned = 0
+        for t in t_month.transactions:
+            if t.amount > 0:
+                total_earned += t.amount
+            else:
+                total_spent += -1 * t.amount
+
+        t_month_summary = {
+            "date": t_month.date,
+            "total_earned": total_earned,
+            "total_spent": total_spent,
+            "net": total_earned - total_spent,
+        }
+        result.append(t_month_summary)
+
+    return jsonify(result)
+
+
 # get amount spent each day for specified month
 @transactions.route("/user/<int:user_id>/by-day", methods=["GET"])
 @http_auth.login_required

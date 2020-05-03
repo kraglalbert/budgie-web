@@ -4,10 +4,16 @@ const routes = [
     redirect: '/home'
   },
   {
-    path: '/home',
+    path: '',
     component: () => import('layouts/LoggedInLayout.vue'),
     meta: { requiresAuth: true },
-    children: [{ path: '', component: () => import('pages/HomePage.vue') }]
+    children: [
+      { path: '/home', component: () => import('pages/HomePage.vue') },
+      {
+        path: '/transactions',
+        component: () => import('pages/TransactionsPage.vue')
+      }
+    ]
   },
   {
     path: '/login',
