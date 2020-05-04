@@ -88,7 +88,7 @@ export default {
   },
   methods: {
     goToTransactionsPage: function () {
-      this.$router.push({ path: "/transactions" });
+      this.$router.push({ path: "/transactions/all" });
     },
   },
 };

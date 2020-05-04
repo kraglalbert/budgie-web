@@ -49,7 +49,7 @@ export default {
       this.loading = true;
       const user = this.$store.state.currentUser;
       this.$axios
-        .get("/transactions/user/" + user.id, {
+        .get(`/transactions/user/${user.id}`, {
           params: {
             month: this.month + 1,
             year: this.year,

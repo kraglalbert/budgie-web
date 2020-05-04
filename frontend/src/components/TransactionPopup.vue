@@ -96,7 +96,7 @@
 import moment from "moment";
 
 export default {
-  name: "HomeNewTransactionPopup",
+  name: "TransactionPopup",
   data: function () {
     return {
       submitting: false,

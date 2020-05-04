@@ -14,7 +14,7 @@
     />
 
     <q-dialog v-model="showNewTransactionDialog">
-      <HomeNewTransactionPopup @transaction-created="notifyParentToRefresh" />
+      <TransactionPopup @transaction-created="notifyParentToRefresh" />
     </q-dialog>
 
     <div v-if="loading" class="text-center q-ma-md">
@@ -24,7 +24,7 @@
       No transactions to show.
     </div>
     <div v-else>
-      <HomeTransactionsListItem
+      <TransactionsListItem
         v-for="t in transactions"
         :key="t.id"
         :transaction="t"
@@ -36,14 +36,14 @@
 
 <script>
 import moment from "moment";
-import HomeTransactionsListItem from "./HomeTransactionsListItem.vue";
-import HomeNewTransactionPopup from "./HomeNewTransactionPopup.vue";
+import TransactionPopup from "./TransactionPopup.vue";
+import TransactionsListItem from "./TransactionsListItem.vue";
 
 export default {
   name: "HomeTransactionsList",
   components: {
-    HomeTransactionsListItem,
-    HomeNewTransactionPopup,
+    TransactionPopup,
+    TransactionsListItem,
   },
   props: {
     transactions: {

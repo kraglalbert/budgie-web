@@ -52,7 +52,7 @@
 
 <script>
 export default {
-  name: "HomeTransactionsListItem",
+  name: "TransactionsListItem",
   props: {
     transaction: {
       type: Object,

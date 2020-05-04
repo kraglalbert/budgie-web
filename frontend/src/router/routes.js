@@ -1,33 +1,37 @@
 const routes = [
   {
-    path: '',
-    redirect: '/home'
+    path: "",
+    redirect: "/home",
   },
   {
-    path: '',
-    component: () => import('layouts/LoggedInLayout.vue'),
+    path: "",
+    component: () => import("layouts/LoggedInLayout.vue"),
     meta: { requiresAuth: true },
     children: [
-      { path: '/home', component: () => import('pages/HomePage.vue') },
+      { path: "/home", component: () => import("pages/HomePage.vue") },
       {
-        path: '/transactions',
-        component: () => import('pages/TransactionsPage.vue')
-      }
-    ]
+        path: "/transactions/all",
+        component: () => import("pages/TransactionsPage.vue"),
+      },
+      {
+        path: "/transactions",
+        component: () => import("pages/TransactionMonthPage.vue"),
+      },
+    ],
   },
   {
-    path: '/login',
-    component: () => import('pages/LoginPage.vue'),
-    children: []
-  }
-]
+    path: "/login",
+    component: () => import("pages/LoginPage.vue"),
+    children: [],
+  },
+];
 
 // Always leave this as last one
-if (process.env.MODE !== 'ssr') {
+if (process.env.MODE !== "ssr") {
   routes.push({
-    path: '*',
-    component: () => import('pages/Error404.vue')
-  })
+    path: "*",
+    component: () => import("pages/Error404.vue"),
+  });
 }
 
-export default routes
+export default routes;
