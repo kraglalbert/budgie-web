@@ -33,8 +33,8 @@
                     hint="Enter your email"
                     lazy-rules
                     :rules="[
-                      val =>
-                        (val && val.length > 0) || 'Please enter your email'
+                      (val) =>
+                        (val && val.length > 0) || 'Please enter your email',
                     ]"
                   />
 
@@ -46,9 +46,9 @@
                     hint="Enter your password"
                     lazy-rules
                     :rules="[
-                      val =>
+                      (val) =>
                         (val !== null && val !== '') ||
-                        'Please enter your password'
+                        'Please enter your password',
                     ]"
                   />
 
@@ -78,7 +78,8 @@
                     hint="Enter your name"
                     lazy-rules
                     :rules="[
-                      val => (val && val.length > 0) || 'Please enter your name'
+                      (val) =>
+                        (val && val.length > 0) || 'Please enter your name',
                     ]"
                   />
 
@@ -89,8 +90,8 @@
                     hint="Enter your email"
                     lazy-rules
                     :rules="[
-                      val =>
-                        (val && val.length > 0) || 'Please enter your email'
+                      (val) =>
+                        (val && val.length > 0) || 'Please enter your email',
                     ]"
                   />
 
@@ -102,9 +103,9 @@
                     hint="Enter your password"
                     lazy-rules
                     :rules="[
-                      val =>
+                      (val) =>
                         (val !== null && val !== '') ||
-                        'Please enter your password'
+                        'Please enter your password',
                     ]"
                   />
 
@@ -116,10 +117,10 @@
                     hint="Confirm your password"
                     lazy-rules
                     :rules="[
-                      val =>
+                      (val) =>
                         (val !== null && val !== '') ||
                         'Please confirm your password',
-                      val => val === password || 'Passwords do not match'
+                      (val) => val === password || 'Passwords do not match',
                     ]"
                   />
 
@@ -149,7 +150,7 @@
 
 <script>
 export default {
-  name: 'LoginPage',
+  name: "LoginPage",
   data: function () {
     return {
       submitting: false,
@@ -157,79 +158,79 @@ export default {
       email: null,
       password: null,
       confirm_password: null,
-      tab: 'login'
-    }
+      tab: "login",
+    };
   },
   methods: {
     onLogIn: function () {
-      this.submitting = true
+      this.submitting = true;
 
-      let email = this.email
-      let password = this.password
+      let email = this.email;
+      let password = this.password;
       this.$store
-        .dispatch('login', { email, password })
+        .dispatch("login", { email, password })
         .then(() => {
           this.$q.notify({
-            color: 'green-4',
-            position: 'top',
-            textColor: 'white',
-            icon: 'cloud_done',
-            message: 'Logged in successfully'
-          })
-          this.submitting = false
-          this.$router.push({ path: '/home' })
+            color: "green-4",
+            position: "top",
+            textColor: "white",
+            icon: "cloud_done",
+            message: "Logged in successfully",
+          });
+          this.submitting = false;
+          this.$router.push({ path: "/home" });
         })
-        .catch(_err => {
+        .catch((_err) => {
           this.$q.notify({
-            color: 'red-4',
-            position: 'top',
-            textColor: 'white',
-            icon: 'error',
-            message: 'Wrong email or password'
-          })
-          this.submitting = false
-        })
+            color: "red-4",
+            position: "top",
+            textColor: "white",
+            icon: "error",
+            message: "Wrong email or password",
+          });
+          this.submitting = false;
+        });
     },
     onSignUp: function () {
-      this.submitting = true
+      this.submitting = true;
 
       this.$axios
-        .post('/auth/register', {
+        .post("/auth/register", {
           name: this.name,
           email: this.email,
-          password: this.password
+          password: this.password,
         })
-        .then(res => {
+        .then((res) => {
           if (res.status === 200) {
             this.$q.notify({
-              color: 'green-4',
-              position: 'top',
-              textColor: 'white',
-              icon: 'cloud_done',
-              message: 'Signed Up Successfully'
-            })
+              color: "green-4",
+              position: "top",
+              textColor: "white",
+              icon: "cloud_done",
+              message: "Signed Up Successfully",
+            });
             // update application state
-            let name = res.data.name
-            let email = this.email
-            this.$store.commit('login', { name, email })
+            let name = res.data.name;
+            let email = this.email;
+            this.$store.commit("login", { name, email });
 
-            this.submitting = false
-            this.$router.push({ path: '/home' })
+            this.submitting = false;
+            this.$router.push({ path: "/home" });
           }
         })
-        .catch(_err => {
+        .catch((_err) => {
           this.$q.notify({
-            color: 'red-4',
-            position: 'top',
-            textColor: 'white',
-            icon: 'error',
-            message: 'Sign Up Error'
-          })
-          this.submitting = false
-        })
-    }
-  }
-}
+            color: "red-4",
+            position: "top",
+            textColor: "white",
+            icon: "error",
+            message: "Sign Up Error",
+          });
+          this.submitting = false;
+        });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

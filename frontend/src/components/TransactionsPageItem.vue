@@ -28,34 +28,34 @@
 </template>
 
 <script>
-import moment from 'moment'
+import moment from "moment";
 
 export default {
-  name: 'TransactionsPageItem',
+  name: "TransactionsPageItem",
   props: {
     transactionMonth: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     transactionMonthDate: function () {
-      const date = this.transactionMonth.date
-      return moment(date).format('MMMM YYYY')
+      const date = this.transactionMonth.date;
+      return moment(date).utc().format("MMMM YYYY");
     },
     totalSpent: function () {
-      return this.getFormattedDollarAmount(this.transactionMonth.total_spent)
+      return this.getFormattedDollarAmount(this.transactionMonth.total_spent);
     },
     totalEarned: function () {
-      return this.getFormattedDollarAmount(this.transactionMonth.total_earned)
+      return this.getFormattedDollarAmount(this.transactionMonth.total_earned);
     },
     net: function () {
       const net =
-        this.transactionMonth.total_earned - this.transactionMonth.total_spent
-      return this.getFormattedDollarAmount(net)
-    }
-  }
-}
+        this.transactionMonth.total_earned - this.transactionMonth.total_spent;
+      return this.getFormattedDollarAmount(net);
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped></style>

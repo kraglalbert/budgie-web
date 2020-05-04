@@ -20,51 +20,51 @@
 </template>
 
 <script>
-import BasePage from './BasePage.vue'
-import HomeTransactionsList from '../components/HomeTransactionsList.vue'
-import HomeSummaryWidget from '../components/HomeSummaryWidget.vue'
+import BasePage from "./BasePage.vue";
+import HomeTransactionsList from "../components/HomeTransactionsList.vue";
+import HomeSummaryWidget from "../components/HomeSummaryWidget.vue";
 
 export default {
-  name: 'HomePage',
+  name: "HomePage",
   components: {
     BasePage,
     HomeSummaryWidget,
-    HomeTransactionsList
+    HomeTransactionsList,
   },
   data: function () {
     return {
       transactions: [],
-      loading: true
-    }
+      loading: true,
+    };
   },
   created: function () {
-    const currentDate = new Date()
-    this.month = currentDate.getMonth()
-    this.year = currentDate.getFullYear()
+    const currentDate = new Date();
+    this.month = currentDate.getMonth();
+    this.year = currentDate.getFullYear();
 
-    this.getTransactionsForCurrentMonth()
+    this.getTransactionsForCurrentMonth();
   },
   methods: {
     getTransactionsForCurrentMonth: function () {
-      this.loading = true
-      const user = this.$store.state.currentUser
+      this.loading = true;
+      const user = this.$store.state.currentUser;
       this.$axios
-        .get('/transactions/user/' + user.id, {
+        .get("/transactions/user/" + user.id, {
           params: {
             month: this.month + 1,
-            year: this.year
+            year: this.year,
           },
           headers: {
-            Authorization: `Bearer ${this.$store.state.token}`
-          }
+            Authorization: `Bearer ${this.$store.state.token}`,
+          },
         })
-        .then(resp => {
-          this.loading = false
-          this.transactions = resp.data.sort(this.compareTransactionDates)
-        })
-    }
-  }
-}
+        .then((resp) => {
+          this.loading = false;
+          this.transactions = resp.data.sort(this.compareTransactionDates);
+        });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped></style>

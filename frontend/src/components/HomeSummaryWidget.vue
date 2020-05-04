@@ -46,52 +46,52 @@
 
 <script>
 export default {
-  name: 'HomeSummaryWidget',
+  name: "HomeSummaryWidget",
   props: {
     transactions: {
       type: Array,
-      required: true
+      required: true,
     },
     loading: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   data: function () {
-    return {}
+    return {};
   },
   computed: {
     amountSpent: function () {
-      var spent = 0
-      this.transactions.forEach(t => {
+      var spent = 0;
+      this.transactions.forEach((t) => {
         if (t.amount < 0) {
-          spent += Math.abs(t.amount)
+          spent += Math.abs(t.amount);
         }
-      })
-      return this.getFormattedDollarAmount(spent)
+      });
+      return this.getFormattedDollarAmount(spent);
     },
     amountEarned: function () {
-      var earned = 0
-      this.transactions.forEach(t => {
+      var earned = 0;
+      this.transactions.forEach((t) => {
         if (t.amount > 0) {
-          earned += t.amount
+          earned += t.amount;
         }
-      })
-      return this.getFormattedDollarAmount(earned)
+      });
+      return this.getFormattedDollarAmount(earned);
     },
     remainingBudget: function () {
-      const user = this.$store.state.currentUser
+      const user = this.$store.state.currentUser;
       return user.monthly_budget === 0
-        ? 'N/A'
-        : this.getFormattedDollarAmount(user.user_budget - this.amountSpent)
-    }
+        ? "N/A"
+        : this.getFormattedDollarAmount(user.user_budget - this.amountSpent);
+    },
   },
   methods: {
     goToTransactionsPage: function () {
-      this.$router.push({ path: '/transactions' })
-    }
-  }
-}
+      this.$router.push({ path: "/transactions" });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

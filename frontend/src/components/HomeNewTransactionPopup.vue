@@ -14,7 +14,8 @@
           label="Transaction Title"
           lazy-rules
           :rules="[
-            val => (val && val.length > 0) || 'Please enter a transaction title'
+            (val) =>
+              (val && val.length > 0) || 'Please enter a transaction title',
           ]"
         />
 
@@ -23,7 +24,7 @@
           v-model="transactionSource"
           label="Source"
           lazy-rules
-          :rules="[val => (val && val.length > 0) || 'Please enter a source']"
+          :rules="[(val) => (val && val.length > 0) || 'Please enter a source']"
         />
 
         <q-input
@@ -36,10 +37,10 @@
           prefix="$"
           lazy-rules
           :rules="[
-            val =>
+            (val) =>
               (val !== null && val !== '') ||
               'Please enter the transaction amount',
-            val => val > 0 || 'Amount cannot be negative or zero'
+            (val) => val > 0 || 'Amount cannot be negative or zero',
           ]"
         />
 
@@ -53,7 +54,7 @@
           text-color="primary"
           :options="[
             { label: 'Spending', value: 'spending' },
-            { label: 'Profit', value: 'profit' }
+            { label: 'Profit', value: 'profit' },
           ]"
         />
 
@@ -92,31 +93,31 @@
 </template>
 
 <script>
-import moment from 'moment'
+import moment from "moment";
 
 export default {
-  name: 'HomeNewTransactionPopup',
+  name: "HomeNewTransactionPopup",
   data: function () {
     return {
       submitting: false,
-      transactionType: 'spending',
-      transactionDate: moment(new Date()).format('YYYY/MM/DD'),
-      transactionTitle: '',
-      transactionSource: '',
-      transactionAmount: ''
-    }
+      transactionType: "spending",
+      transactionDate: moment(new Date()).format("YYYY/MM/DD"),
+      transactionTitle: "",
+      transactionSource: "",
+      transactionAmount: "",
+    };
   },
   methods: {
     createTransaction: function () {
-      this.submitting = true
+      this.submitting = true;
 
-      const user = this.$store.state.currentUser
-      let amount = parseFloat(this.transactionAmount) * 100
-      if (this.transactionType === 'spending') {
-        amount = -1 * amount
+      const user = this.$store.state.currentUser;
+      let amount = parseFloat(this.transactionAmount) * 100;
+      if (this.transactionType === "spending") {
+        amount = -1 * amount;
       }
 
-      const date = new Date(this.transactionDate)
+      const date = new Date(this.transactionDate);
 
       const body = {
         title: this.transactionTitle,
@@ -125,40 +126,40 @@ export default {
         email: user.email,
         year: date.getFullYear(),
         month: date.getUTCMonth() + 1,
-        day: date.getUTCDate()
-      }
+        day: date.getUTCDate(),
+      };
 
       this.$axios
-        .post('/transactions', body, {
+        .post("/transactions", body, {
           headers: {
-            Authorization: `Bearer ${this.$store.state.token}`
-          }
+            Authorization: `Bearer ${this.$store.state.token}`,
+          },
         })
-        .then(_resp => {
+        .then((_resp) => {
           this.$q.notify({
-            color: 'green-4',
-            position: 'top',
-            textColor: 'white',
-            icon: 'cloud_done',
-            message: 'Transaction Added Successfully'
-          })
-          this.submitting = false
+            color: "green-4",
+            position: "top",
+            textColor: "white",
+            icon: "cloud_done",
+            message: "Transaction Added Successfully",
+          });
+          this.submitting = false;
           // let parent know to close the dialog
-          this.$emit('transaction-created')
+          this.$emit("transaction-created");
         })
-        .catch(_err => {
+        .catch((_err) => {
           this.$q.notify({
-            color: 'red-4',
-            position: 'top',
-            textColor: 'white',
-            icon: 'error',
-            message: 'Something went wrong, please try again'
-          })
-          this.submitting = false
-        })
-    }
-  }
-}
+            color: "red-4",
+            position: "top",
+            textColor: "white",
+            icon: "error",
+            message: "Something went wrong, please try again",
+          });
+          this.submitting = false;
+        });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

@@ -6,12 +6,12 @@
           ><router-link to="/home">budgie</router-link></q-toolbar-title
         >
 
-        <div style="padding-right: 10px">
+        <div style="padding-right: 10px;">
           {{ $store.state.currentUser.name }}
         </div>
         <q-btn flat dense round icon="settings" aria-label="Settings">
           <q-menu>
-            <q-list style="min-width: 100px">
+            <q-list style="min-width: 100px;">
               <q-item clickable v-close-popup>
                 <q-item-section>Settings</q-item-section>
               </q-item>
@@ -33,17 +33,17 @@
 
 <script>
 export default {
-  name: 'MainLayout',
+  name: "MainLayout",
 
-  data () {
-    return {}
+  data() {
+    return {};
   },
   methods: {
     logout: function () {
-      this.$store.dispatch('logout').then(this.$router.push({ path: 'login' }))
-    }
-  }
-}
+      this.$store.dispatch("logout").then(this.$router.push({ path: "login" }));
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

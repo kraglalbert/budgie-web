@@ -35,38 +35,38 @@
 </template>
 
 <script>
-import moment from 'moment'
-import HomeTransactionsListItem from './HomeTransactionsListItem.vue'
-import HomeNewTransactionPopup from './HomeNewTransactionPopup.vue'
+import moment from "moment";
+import HomeTransactionsListItem from "./HomeTransactionsListItem.vue";
+import HomeNewTransactionPopup from "./HomeNewTransactionPopup.vue";
 
 export default {
-  name: 'HomeTransactionsList',
+  name: "HomeTransactionsList",
   components: {
     HomeTransactionsListItem,
-    HomeNewTransactionPopup
+    HomeNewTransactionPopup,
   },
   props: {
     transactions: {
       type: Array,
-      required: true
+      required: true,
     },
     loading: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   data: function () {
     return {
-      showNewTransactionDialog: false
-    }
+      showNewTransactionDialog: false,
+    };
   },
   methods: {
     notifyParentToRefresh: function () {
-      this.showNewTransactionDialog = false
-      this.$emit('refresh')
-    }
-  }
-}
+      this.showNewTransactionDialog = false;
+      this.$emit("refresh");
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

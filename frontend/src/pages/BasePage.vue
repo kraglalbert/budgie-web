@@ -19,11 +19,11 @@ This is how it can be used in page components:
 
 <script>
 export default {
-  name: 'BasePage',
+  name: "BasePage",
   props: {
-    title: String
-  }
-}
+    title: String,
+  },
+};
 </script>
 
 <style lang="scss" scoped>

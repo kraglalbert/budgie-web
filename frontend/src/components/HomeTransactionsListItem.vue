@@ -28,10 +28,10 @@
             round
             icon="more_vert"
             aria-label="Edit"
-            style="margin-left: 5px"
+            style="margin-left: 5px;"
           >
             <q-menu>
-              <q-list style="min-width: 100px">
+              <q-list style="min-width: 100px;">
                 <q-item clickable v-close-popup>
                   <q-item-section>Edit</q-item-section>
                 </q-item>
@@ -52,43 +52,43 @@
 
 <script>
 export default {
-  name: 'HomeTransactionsListItem',
+  name: "HomeTransactionsListItem",
   props: {
     transaction: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   methods: {
     deleteTransaction: function () {
       this.$axios
         .delete(`/transactions/${this.transaction.id}`, {
           headers: {
-            Authorization: `Bearer ${this.$store.state.token}`
-          }
+            Authorization: `Bearer ${this.$store.state.token}`,
+          },
         })
-        .then(_resp => {
+        .then((_resp) => {
           this.$q.notify({
-            color: 'green-4',
-            position: 'top',
-            textColor: 'white',
-            icon: 'cloud_done',
-            message: 'Transaction Deleted Successfully'
-          })
-          this.$emit('refresh')
+            color: "green-4",
+            position: "top",
+            textColor: "white",
+            icon: "cloud_done",
+            message: "Transaction Deleted Successfully",
+          });
+          this.$emit("refresh");
         })
-        .catch(_err => {
+        .catch((_err) => {
           this.$q.notify({
-            color: 'red-4',
-            position: 'top',
-            textColor: 'white',
-            icon: 'error',
-            message: 'Something went wrong, please try again'
-          })
-        })
-    }
-  }
-}
+            color: "red-4",
+            position: "top",
+            textColor: "white",
+            icon: "error",
+            message: "Something went wrong, please try again",
+          });
+        });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
