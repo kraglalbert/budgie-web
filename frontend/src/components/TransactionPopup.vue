@@ -1,13 +1,13 @@
 <template>
   <q-card id="container">
     <q-card-section class="row items-center">
-      <div class="text-h6">Add New Transaction</div>
+      <div class="text-h6">{{ title }}</div>
       <q-space />
       <q-btn icon="close" flat round dense v-close-popup />
     </q-card-section>
 
     <q-card-section>
-      <q-form @submit="createTransaction">
+      <q-form @submit="onSubmit">
         <q-input
           filled
           v-model="transactionTitle"
@@ -78,7 +78,7 @@
         <q-btn
           color="primary"
           type="submit"
-          label="Add"
+          :label="buttonLabel"
           :disabled="submitting"
         />
         <q-spinner
@@ -97,17 +97,47 @@ import moment from "moment";
 
 export default {
   name: "TransactionPopup",
+  props: {
+    transaction: Object,
+  },
   data: function () {
     return {
       submitting: false,
+      title: "Add New Transaction",
+      buttonLabel: "Add",
       transactionType: "spending",
-      transactionDate: moment(new Date()).format("YYYY/MM/DD"),
+      transactionDate: moment(new Date()).utc().format("YYYY/MM/DD"),
       transactionTitle: "",
       transactionSource: "",
       transactionAmount: "",
     };
   },
+  created: function () {
+    if (this.transaction) {
+      this.title = "Edit Transaction";
+      this.buttonLabel = "Update";
+
+      this.transactionDate = moment(new Date(this.transaction.date))
+        .utc()
+        .format("YYYY/MM/DD");
+      this.transactionTitle = this.transaction.title;
+      this.transactionSource = this.transaction.source;
+      this.transactionAmount =
+        this.transaction.amount > 0
+          ? this.transaction.amount
+          : -1 * this.transaction.amount;
+      this.transactionType =
+        this.transaction.amount > 0 ? "profit" : "spending";
+    }
+  },
   methods: {
+    onSubmit: function () {
+      if (this.transaction) {
+        this.updateTransaction();
+      } else {
+        this.createTransaction();
+      }
+    },
     createTransaction: function () {
       this.submitting = true;
 
@@ -146,6 +176,55 @@ export default {
           this.submitting = false;
           // let parent know to close the dialog
           this.$emit("transaction-created");
+        })
+        .catch((_err) => {
+          this.$q.notify({
+            color: "red-4",
+            position: "top",
+            textColor: "white",
+            icon: "error",
+            message: "Something went wrong, please try again",
+          });
+          this.submitting = false;
+        });
+    },
+    updateTransaction: function () {
+      this.submitting = true;
+
+      const user = this.$store.state.currentUser;
+      let amount = parseFloat(this.transactionAmount) * 100;
+      if (this.transactionType === "spending") {
+        amount = -1 * amount;
+      }
+
+      const date = new Date(this.transactionDate);
+
+      const body = {
+        title: this.transactionTitle,
+        source: this.transactionSource,
+        amount: amount,
+        email: user.email,
+        year: date.getFullYear(),
+        month: date.getUTCMonth() + 1,
+        day: date.getUTCDate(),
+      };
+      this.$axios
+        .put(`/transactions/${this.transaction.id}`, body, {
+          headers: {
+            Authorization: `Bearer ${this.$store.state.token}`,
+          },
+        })
+        .then((_resp) => {
+          this.$q.notify({
+            color: "green-4",
+            position: "top",
+            textColor: "white",
+            icon: "cloud_done",
+            message: "Transaction Updated Successfully",
+          });
+          this.submitting = false;
+          // let parent know to close the dialog
+          this.$emit("transaction-updated");
         })
         .catch((_err) => {
           this.$q.notify({

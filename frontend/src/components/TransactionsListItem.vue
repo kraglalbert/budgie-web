@@ -8,6 +8,7 @@
           {{ getFormattedDate(transaction.date) }}
         </div>
       </div>
+
       <div class="col-3">
         <div class="float-right">
           <q-badge
@@ -32,7 +33,11 @@
           >
             <q-menu>
               <q-list style="min-width: 100px;">
-                <q-item clickable v-close-popup>
+                <q-item
+                  clickable
+                  v-close-popup
+                  @click="showTransactionPopup = true"
+                >
                   <q-item-section>Edit</q-item-section>
                 </q-item>
                 <q-separator />
@@ -46,20 +51,41 @@
           </q-btn>
         </div>
       </div>
+
+      <q-dialog v-model="showTransactionPopup">
+        <TransactionPopup
+          :transaction="transaction"
+          @transaction-updated="notifyParentToRefresh"
+        />
+      </q-dialog>
     </div>
   </div>
 </template>
 
 <script>
+import TransactionPopup from "./TransactionPopup.vue";
+
 export default {
   name: "TransactionsListItem",
+  components: {
+    TransactionPopup,
+  },
   props: {
     transaction: {
       type: Object,
       required: true,
     },
   },
+  data: function () {
+    return {
+      showTransactionPopup: false,
+    };
+  },
   methods: {
+    notifyParentToRefresh: function () {
+      this.showTransactionPopup = false;
+      this.$emit("refresh");
+    },
     deleteTransaction: function () {
       this.$axios
         .delete(`/transactions/${this.transaction.id}`, {
