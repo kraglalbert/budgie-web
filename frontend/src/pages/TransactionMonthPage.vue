@@ -154,7 +154,7 @@ export default {
             if (transaction.amount > 0) {
               this.totalEarned += transaction.amount;
             } else {
-              this.totalSpent = +-1 * transaction.amount;
+              this.totalSpent += -1 * transaction.amount;
             }
           });
           // construct filtered list of transactions
