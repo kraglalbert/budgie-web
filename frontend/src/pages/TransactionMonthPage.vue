@@ -10,9 +10,12 @@
             <q-item-section class="col">
               <q-item-label overline>NET</q-item-label>
               <q-item-label>
-                <q-badge v-if="net > 0" outline color="positive">{{
-                  netFormatted
-                }}</q-badge>
+                <q-badge
+                  v-if="this.totalEarned - this.totalSpent > 0"
+                  outline
+                  color="positive"
+                  >{{ netFormatted }}</q-badge
+                >
                 <q-badge v-else outline color="negative">{{
                   netFormatted
                 }}</q-badge>
@@ -117,7 +120,6 @@ export default {
       filteredTransactions: [],
       totalSpent: 0,
       totalEarned: 0,
-      net: 0,
     };
   },
   created: function () {
@@ -190,6 +192,9 @@ export default {
     applyFilter: function () {
       this.loading = true;
       this.filteredTransactions = [];
+      this.totalEarned = 0;
+      this.totalSpent = 0;
+
       this.transactions.forEach((transaction) => {
         // TODO: implement the remaining filters
         if (
@@ -197,6 +202,11 @@ export default {
           this.matchesCategoryFilter(transaction)
         ) {
           this.filteredTransactions.push(transaction);
+          if (transaction.amount > 0) {
+            this.totalEarned += transaction.amount;
+          } else {
+            this.totalSpent += -1 * transaction.amount;
+          }
         }
       });
       this.loading = false;
