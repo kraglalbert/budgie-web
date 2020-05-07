@@ -14,8 +14,8 @@
                   v-if="this.totalEarned - this.totalSpent > 0"
                   outline
                   color="positive"
-                  >{{ netFormatted }}</q-badge
-                >
+                  >{{ netFormatted }}
+                </q-badge>
                 <q-badge v-else outline color="negative">{{
                   netFormatted
                 }}</q-badge>

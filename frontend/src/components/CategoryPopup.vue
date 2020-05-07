@@ -15,6 +15,7 @@
           lazy-rules
           :rules="[
             (val) => (val && val.length > 0) || 'Please enter a category name',
+            (val) => (val && val.length <= 50) || 'Maximum 50 characters',
           ]"
         />
 
@@ -101,7 +102,40 @@ export default {
           this.submitting = false;
         });
     },
-    updateCategory: function () {},
+    updateCategory: function () {
+      this.submitting = true;
+
+      const body = {
+        name: this.categoryName,
+      };
+      this.$axios
+        .put(`/categories/${this.category.id}`, body, {
+          headers: {
+            Authorization: `Bearer ${this.$store.state.token}`,
+          },
+        })
+        .then((resp) => {
+          this.$q.notify({
+            color: "green-4",
+            position: "top",
+            textColor: "white",
+            icon: "cloud_done",
+            message: "Category Updated Successfully",
+          });
+          this.submitting = false;
+          this.$emit("category-updated");
+        })
+        .catch(() => {
+          this.$q.notify({
+            color: "red-4",
+            position: "top",
+            textColor: "white",
+            icon: "error",
+            message: "Something went wrong, please try again",
+          });
+          this.submitting = false;
+        });
+    },
   },
 };
 </script>

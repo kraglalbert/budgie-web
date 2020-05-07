@@ -5,7 +5,13 @@
     </div>
     <div class="col">
       <div class="float-right">
-        <q-btn flat color="primary" label="Edit" :disabled="submitting" />
+        <q-btn
+          flat
+          color="primary"
+          label="Edit"
+          :disabled="submitting"
+          @click="showCategoryPopup = true"
+        />
         <q-btn
           flat
           color="negative"
@@ -15,12 +21,24 @@
         />
       </div>
     </div>
+
+    <q-dialog v-model="showCategoryPopup">
+      <CategoryPopup
+        :category="category"
+        @category-updated="notifyParentToRefresh"
+      />
+    </q-dialog>
   </div>
 </template>
 
 <script>
+import CategoryPopup from "./CategoryPopup.vue";
+
 export default {
   name: "CategoriesPageItem",
+  components: {
+    CategoryPopup,
+  },
   props: {
     category: {
       type: Object,
@@ -30,9 +48,14 @@ export default {
   data: function () {
     return {
       submitting: false,
+      showCategoryPopup: false,
     };
   },
   methods: {
+    notifyParentToRefresh: function () {
+      this.showCategoryPopup = false;
+      this.$emit("refresh");
+    },
     deleteCategory: function () {
       this.submitting = true;
 
