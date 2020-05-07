@@ -47,6 +47,15 @@
           <div class="col">
             <q-select
               outlined
+              v-model="category"
+              hint="Category"
+              :options="categoryOptions"
+              @input="applyFilter"
+            />
+          </div>
+          <div class="col">
+            <q-select
+              outlined
               v-model="currency"
               hint="Currency"
               :options="currencyOptions"
@@ -97,9 +106,11 @@ export default {
     return {
       loading: true,
       transactionTypeOptions: ["All", "Profits", "Spendings"],
+      categoryOptions: ["All", "None"],
       currencyOptions: ["All"],
       displayModeOptions: ["Individual", "Grouped"],
       transactionType: "All",
+      category: "All",
       currency: "All",
       displayMode: "Individual",
       transactions: [],
@@ -110,6 +121,7 @@ export default {
     };
   },
   created: function () {
+    this.getCategories();
     this.getTransactions();
   },
   computed: {
@@ -131,6 +143,20 @@ export default {
     },
   },
   methods: {
+    getCategories: function () {
+      const userId = this.$store.state.currentUser.id;
+      this.$axios
+        .get(`/categories/user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${this.$store.state.token}`,
+          },
+        })
+        .then((resp) => {
+          resp.data.forEach((category) => {
+            this.categoryOptions.push(category.name);
+          });
+        });
+    },
     getTransactions: function () {
       this.loading = true;
       const month = this.$route.query.month;
@@ -166,7 +192,10 @@ export default {
       this.filteredTransactions = [];
       this.transactions.forEach((transaction) => {
         // TODO: implement the remaining filters
-        if (this.matchesTypeFilter(transaction)) {
+        if (
+          this.matchesTypeFilter(transaction) &&
+          this.matchesCategoryFilter(transaction)
+        ) {
           this.filteredTransactions.push(transaction);
         }
       });
@@ -177,9 +206,22 @@ export default {
         this.transactionType === "All" ||
         (this.transactionType === "Profits" && transaction.amount > 0) ||
         (this.transactionType === "Spendings" && transaction.amount < 0)
-      )
+      ) {
         return true;
-      else return false;
+      } else {
+        return false;
+      }
+    },
+    matchesCategoryFilter: function (transaction) {
+      if (
+        (this.category === "None" && !transaction.category) ||
+        this.category === "All" ||
+        this.category === transaction.category
+      ) {
+        return true;
+      } else {
+        return false;
+      }
     },
   },
 };
