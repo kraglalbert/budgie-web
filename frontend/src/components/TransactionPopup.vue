@@ -27,6 +27,14 @@
           :rules="[(val) => (val && val.length > 0) || 'Please enter a source']"
         />
 
+        <q-select
+          filled
+          class="q-mb-md"
+          v-model="transactionCategory"
+          label="Category"
+          :options="transactionCategoryOptions"
+        />
+
         <q-input
           filled
           v-model="transactionAmount"
@@ -110,9 +118,25 @@ export default {
       transactionTitle: "",
       transactionSource: "",
       transactionAmount: "",
+      transactionCategory: "None",
+      transactionCategoryOptions: [],
     };
   },
   created: function () {
+    const userId = this.$store.state.currentUser.id;
+    this.$axios
+      .get(`/categories/user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${this.$store.state.token}`,
+        },
+      })
+      .then((resp) => {
+        this.transactionCategoryOptions.push("None");
+        resp.data.forEach((category) => {
+          this.transactionCategoryOptions.push(category.name);
+        });
+      });
+
     if (this.transaction) {
       this.title = "Edit Transaction";
       this.buttonLabel = "Update";
@@ -153,6 +177,7 @@ export default {
         title: this.transactionTitle,
         source: this.transactionSource,
         amount: amount,
+        category: this.transactionCategory,
         email: user.email,
         year: date.getFullYear(),
         month: date.getUTCMonth() + 1,

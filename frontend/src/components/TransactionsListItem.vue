@@ -6,6 +6,10 @@
         <div class="text-body2">{{ transaction.source }}</div>
         <div class="text-caption">
           {{ getFormattedDate(transaction.date) }}
+          <span v-if="transaction.category">
+            &bull;
+            <q-badge color="primary">{{ transaction.category }}</q-badge>
+          </span>
         </div>
       </div>
 

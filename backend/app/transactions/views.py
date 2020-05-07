@@ -4,7 +4,7 @@ from sqlalchemy import extract
 from calendar import monthrange
 from . import transactions
 from .. import db, http_auth
-from app.models import User, Transaction, TransactionMonth
+from app.models import User, Transaction, TransactionMonth, Category
 
 # get all transactions
 @transactions.route("", methods=["GET"])
@@ -60,7 +60,7 @@ def get_transactions_for_user(user_id):
 @transactions.route("/user/<int:user_id>/months", methods=["GET"])
 @http_auth.login_required
 def get_transaction_months_for_user(user_id):
-    transaction_months = TransactionMonth.query.filter_by(user_id=user_id,).all()
+    transaction_months = TransactionMonth.query.filter_by(user_id=user_id).all()
     result = []
 
     for t_month in transaction_months:
@@ -133,7 +133,7 @@ def get_amount_by_day(user_id):
 @http_auth.login_required
 def get_transaction(id):
     t = Transaction.query.filter_by(id=id).first()
-    if t == None:
+    if t is None:
         abort(404, "No transaction found with specified ID")
     return jsonify(t.serialize)
 
@@ -147,6 +147,7 @@ def create_transaction():
     source = data.get("source")
     amount = int(data.get("amount"))
     email = data.get("email")
+    category_name = data.get("category")
 
     year = data.get("year")
     month = data.get("month")
@@ -186,12 +187,21 @@ def create_transaction():
         db.session.add(t_month)
         db.session.commit()
 
+    # get category object
+    category_id = None
+    if category_name != "None":
+        category = Category.query.filter(
+            Category.user_id == user.id, Category.name == category_name
+        ).first()
+        category_id = category.id
+
     new_transaction = Transaction(
         title=title,
         source=source,
         amount=amount,
         user_id=user.id,
         date=date,
+        category_id=category_id,
         transaction_month_id=t_month.id,
     )
     db.session.add(new_transaction)
@@ -230,7 +240,7 @@ def update_transaction(id):
 
     t = Transaction.query.filter_by(id=id).first()
     if t is None:
-        abort(404, "No transaction found with specified ID")
+        abort(400, "No transaction found with specified ID")
 
     t.title = title
     t.source = source

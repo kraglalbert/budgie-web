@@ -14,6 +14,7 @@
           :loading="loading"
           @refresh="getTransactionsForCurrentMonth"
         />
+        <HomeCategoriesWidget />
       </div>
     </div>
   </BasePage>
@@ -21,6 +22,7 @@
 
 <script>
 import BasePage from "./BasePage.vue";
+import HomeCategoriesWidget from "../components/HomeCategoriesWidget";
 import HomeTransactionsList from "../components/HomeTransactionsList.vue";
 import HomeSummaryWidget from "../components/HomeSummaryWidget.vue";
 
@@ -28,6 +30,7 @@ export default {
   name: "HomePage",
   components: {
     BasePage,
+    HomeCategoriesWidget,
     HomeSummaryWidget,
     HomeTransactionsList,
   },

@@ -32,6 +32,10 @@ def create_app(config_name):
 
     app.register_blueprint(auth_blueprint, url_prefix="/auth")
 
+    from .categories import categories as categories_blueprint
+
+    app.register_blueprint(categories_blueprint, url_prefix="/categories")
+
     from .users import users as users_blueprint
 
     app.register_blueprint(users_blueprint, url_prefix="/users")

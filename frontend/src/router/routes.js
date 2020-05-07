@@ -17,6 +17,10 @@ const routes = [
         path: "/transactions",
         component: () => import("pages/TransactionMonthPage.vue"),
       },
+      {
+        path: "/categories",
+        component: () => import("pages/CategoriesPage.vue"),
+      },
     ],
   },
   {

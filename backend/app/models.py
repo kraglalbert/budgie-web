@@ -15,6 +15,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(128))
     monthly_budget = db.Column(db.Integer)  # amount in cents
     default_currency = db.Column(db.String(3))  # 3-letter currency code
+    categories = db.relationship("Category", backref="users", lazy=True)
     transactions = db.relationship("Transaction", backref="users", lazy=True)
     transactions_months = db.relationship(
         "TransactionMonth", backref="users", lazy=True
@@ -85,11 +86,12 @@ class User(db.Model):
 class Transaction(db.Model):
     __tablename__ = "transactions"
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(64), unique=False, nullable=False)
+    title = db.Column(db.String(64), nullable=False)
     source = db.Column(db.String(64), nullable=False)
     # amount in cents
     amount = db.Column(db.Integer, nullable=False)
     date = db.Column(db.Date, nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     transaction_month_id = db.Column(
         db.Integer, db.ForeignKey("transaction_months.id"), nullable=False
@@ -98,15 +100,17 @@ class Transaction(db.Model):
     @property
     def serialize(self):
         """Return object data in serializeable format"""
+        category = None
+        if self.category_id is not None:
+            category = Category.query.filter_by(id=self.category_id).first()
+
         return {
             "id": self.id,
             "title": self.title,
             "source": self.source,
             "amount": self.amount,
             "date": self.date,
-            "year": self.date.year,
-            "month": self.date.month,
-            "day": self.date.day,
+            "category": category.name if category is not None else None,
             "user_id": self.user_id,
             "transaction_month_id": self.transaction_month_id,
         }
@@ -139,7 +143,7 @@ class TransactionMonth(db.Model):
             "date": self.date,
             "year": self.date.year,
             "month": self.date.month,
-            "transactions": self.transactions,
+            "transactions": Transaction.serialize_list(self.transactions),
         }
 
     @staticmethod
@@ -151,3 +155,31 @@ class TransactionMonth(db.Model):
 
     def __repr__(self):
         return "<TransactionMonth %r>" % self.title
+
+
+class Category(db.Model):
+    __tablename__ = "categories"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    transactions = db.relationship("Transaction", backref="categories", lazy=True)
+
+    @property
+    def serialize(self):
+        """Return object data in serializeable format"""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "user_id": self.user_id,
+            "transactions": Transaction.serialize_list(self.transactions),
+        }
+
+    @staticmethod
+    def serialize_list(categories):
+        json_categories = []
+        for c in categories:
+            json_categories.append(c.serialize)
+        return json_categories
+
+    def __repr__(self):
+        return "<Category %r>" % self.name
