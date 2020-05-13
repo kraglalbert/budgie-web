@@ -70,4 +70,9 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.max-width {
+  width: 100%;
+  min-width: 250px;
+}
+</style>

@@ -11,7 +11,17 @@
         </div>
         <q-btn flat dense round icon="settings" aria-label="Settings">
           <q-menu>
-            <q-list style="min-width: 100px;">
+            <q-list style="min-width: 200px;">
+              <q-item clickable v-close-popup @click="showCurrencyPopup = true">
+                <q-item-section>
+                  <div class="row">
+                    Currency:
+                    <q-space />
+                    <q-badge color="accent">{{ selectedCurrency }}</q-badge>
+                  </div>
+                </q-item-section>
+              </q-item>
+              <q-separator />
               <q-item clickable v-close-popup>
                 <q-item-section>Settings</q-item-section>
               </q-item>
@@ -25,6 +35,13 @@
       </q-toolbar>
     </q-header>
 
+    <q-dialog v-model="showCurrencyPopup">
+      <CurrencyPopup
+        :currency="selectedCurrency"
+        @currency-updated="refreshUser"
+      />
+    </q-dialog>
+
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -32,13 +49,24 @@
 </template>
 
 <script>
-export default {
-  name: "MainLayout",
+import CurrencyPopup from "../components/CurrencyPopup";
 
-  data() {
-    return {};
+export default {
+  name: "LoggedInLayout",
+  components: {
+    CurrencyPopup,
+  },
+  data: function () {
+    return {
+      selectedCurrency: this.$store.getters.userCurrency,
+      showCurrencyPopup: false,
+    };
   },
   methods: {
+    refreshUser: function () {
+      this.showCurrencyPopup = false;
+      this.selectedCurrency = this.$store.getters.userCurrency;
+    },
     logout: function () {
       this.$store.dispatch("logout").then(this.$router.push({ path: "login" }));
     },

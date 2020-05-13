@@ -40,6 +40,10 @@ def get_user_by_email(email):
 def update_user_settings(user_id):
     data = request.get_json(force=True)
 
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        abort(404, "No user found with specified ID")
+
     try:
         monthly_budget = int(data.get("monthly_budget"))
     except TypeError:
@@ -47,21 +51,20 @@ def update_user_settings(user_id):
 
     default_currency = data.get("default_currency")
 
-    if monthly_budget is None or default_currency is None:
-        abort(400, "Must give values for monthly budget and default currency")
+    if monthly_budget is None and default_currency is None:
+        abort(400, "Must give values for monthly budget or default currency")
 
-    if monthly_budget < 0:
-        abort(400, "Monthly budget cannot be negative")
+    if monthly_budget is not None:
+        if monthly_budget < 0:
+            abort(400, "Monthly budget cannot be negative")
 
-    if len(default_currency) != 3 or re.match("[A-Z]{3}", default_currency) is None:
-        abort(400, "Default currency must be in 3-letter currency code format")
+        user.monthly_budget = monthly_budget
 
-    user = User.query.filter_by(id=user_id).first()
-    if user is None:
-        abort(404, "No user found with specified ID")
+    if default_currency is not None:
+        if len(default_currency) != 3 or re.match("[A-Z]{3}", default_currency) is None:
+            abort(400, "Default currency must be in 3-letter currency code format")
 
-    user.monthly_budget = monthly_budget
-    user.default_currency = default_currency
+        user.default_currency = default_currency
 
     db.session.add(user)
     db.session.commit()

@@ -1,5 +1,5 @@
 <template>
-  <q-card bordered id="card">
+  <q-card bordered id="card" class="q-mt-lg q-ml-sm">
     <q-card-section>
       <div class="text-h6">Categories</div>
     </q-card-section>
@@ -63,7 +63,5 @@ export default {
 #card {
   width: 100%;
   min-width: 250px;
-  margin-top: 25px;
-  margin-left: 10px;
 }
 </style>
