@@ -56,6 +56,7 @@ export default {
           params: {
             month: this.month + 1,
             year: this.year,
+            currency: this.$store.getters.userCurrency,
           },
           headers: {
             Authorization: `Bearer ${this.$store.state.token}`,

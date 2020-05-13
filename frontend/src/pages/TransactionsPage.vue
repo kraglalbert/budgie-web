@@ -36,6 +36,9 @@ export default {
         headers: {
           Authorization: `Bearer ${this.$store.state.token}`,
         },
+        params: {
+          currency: this.$store.getters.userCurrency,
+        },
       })
       .then((resp) => {
         this.loading = false;

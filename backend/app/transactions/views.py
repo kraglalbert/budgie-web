@@ -20,6 +20,10 @@ def get_transactions():
 def get_transactions_for_user(user_id):
     year = request.args.get("year")
     month = request.args.get("month")
+    currency = request.args.get("currency")
+
+    if currency is None:
+        abort(400, "No currency specified")
 
     if year is not None and month is None:
         # get all transactions for specified year
@@ -32,12 +36,16 @@ def get_transactions_for_user(user_id):
 
         transactions = []
         for t_month in t_months:
-            transactions.extend(t_month.transactions)
+            transactions.extend(
+                filter(lambda t: t.currency == currency, t_month.transactions)
+            )
         return jsonify(Transaction.serialize_list(transactions))
 
     if year is None and month is None:
         # return all transactions for user
-        transactions = Transaction.query.filter_by(user_id=user_id).all()
+        transactions = Transaction.query.filter_by(
+            user_id=user_id, currency=currency
+        ).all()
         return jsonify(Transaction.serialize_list(transactions))
 
     if year is None and month is not None:
@@ -52,7 +60,7 @@ def get_transactions_for_user(user_id):
     if t_month is None:
         return jsonify([])
 
-    transactions = t_month.transactions
+    transactions = filter(lambda t: t.currency == currency, t_month.transactions)
     return jsonify(Transaction.serialize_list(transactions))
 
 
@@ -60,13 +68,24 @@ def get_transactions_for_user(user_id):
 @transactions.route("/user/<int:user_id>/months", methods=["GET"])
 @http_auth.login_required
 def get_transaction_months_for_user(user_id):
+    currency = request.args.get("currency")
+
+    if currency is None:
+        abort(400, "No currency specified")
+
     transaction_months = TransactionMonth.query.filter_by(user_id=user_id).all()
     result = []
 
     for t_month in transaction_months:
         total_spent = 0
         total_earned = 0
-        for t in t_month.transactions:
+        filtered_transactions = list(
+            filter(lambda t: t.currency == currency, t_month.transactions)
+        )
+        if len(filtered_transactions) == 0:
+            continue
+
+        for t in filtered_transactions:
             if t.amount > 0:
                 total_earned += t.amount
             else:
