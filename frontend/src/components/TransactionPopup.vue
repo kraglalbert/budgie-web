@@ -132,7 +132,7 @@ export default {
       transactionSource: "",
       transactionAmount: "",
       transactionCategory: "None",
-      transactionCurrency: "",
+      transactionCurrency: this.$store.getters.userCurrency,
       transactionCategoryOptions: [],
     };
   },
