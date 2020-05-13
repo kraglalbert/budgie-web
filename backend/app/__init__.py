@@ -1,11 +1,15 @@
+import os
+
 from flask import Flask
 from flask_cors import CORS
 from flask_httpauth import HTTPTokenAuth
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate, MigrateCommand
 
 from config import config
 
 db = SQLAlchemy()
+migrate = Migrate()
 http_auth = HTTPTokenAuth("Bearer")
 
 
@@ -17,11 +21,15 @@ def create_app(config_name):
             r"/*": {"origins": [r"http://localhost:*", r"http://192.168.0.11:*"]}
         },
     )
+    if config_name is None:
+        config_name = os.getenv("FLASK_CONFIG" or "default")
+
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
     # call init_app to complete initialization
     db.init_app(app)
+    migrate.init_app(app, db)
 
     # create app blueprints
     from .main import main as main_blueprint
