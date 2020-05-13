@@ -1,5 +1,5 @@
 <template>
-  <q-card id="container">
+  <q-card id="popup-container">
     <q-card-section class="row items-center">
       <div class="text-h6">{{ title }}</div>
       <q-space />
@@ -35,22 +35,35 @@
           :options="transactionCategoryOptions"
         />
 
-        <q-input
-          filled
-          v-model="transactionAmount"
-          label="Amount"
-          mask="#.##"
-          fill-mask="0"
-          reverse-fill-mask
-          prefix="$"
-          lazy-rules
-          :rules="[
-            (val) =>
-              (val !== null && val !== '') ||
-              'Please enter the transaction amount',
-            (val) => val > 0 || 'Amount cannot be negative or zero',
-          ]"
-        />
+        <div class="row q-col-gutter-sm">
+          <div class="col-8">
+            <q-input
+              filled
+              v-model="transactionAmount"
+              label="Amount"
+              mask="#.##"
+              fill-mask="0"
+              reverse-fill-mask
+              prefix="$"
+              lazy-rules
+              :rules="[
+                (val) =>
+                  (val !== null && val !== '') ||
+                  'Please enter the transaction amount',
+                (val) => val > 0 || 'Amount cannot be negative or zero',
+              ]"
+            />
+          </div>
+          <div class="col-4">
+            <q-select
+              filled
+              class="col-4"
+              v-model="transactionCurrency"
+              hint="Currency"
+              :options="getSupportedCurrencies()"
+            />
+          </div>
+        </div>
 
         <q-btn-toggle
           v-model="transactionType"
@@ -119,6 +132,7 @@ export default {
       transactionSource: "",
       transactionAmount: "",
       transactionCategory: "None",
+      transactionCurrency: "",
       transactionCategoryOptions: [],
     };
   },
@@ -146,10 +160,13 @@ export default {
         .format("YYYY/MM/DD");
       this.transactionTitle = this.transaction.title;
       this.transactionSource = this.transaction.source;
-      this.transactionAmount =
-        this.transaction.amount > 0
-          ? this.transaction.amount
-          : -1 * this.transaction.amount;
+
+      const amountFormatted = this.getFormattedDollarAmount(
+        this.transaction.amount
+      ).replace(/-|\$/g, "");
+      this.transactionAmount = amountFormatted;
+
+      this.transactionCurrency = this.transaction.currency;
       this.transactionType =
         this.transaction.amount > 0 ? "profit" : "spending";
     }
@@ -177,6 +194,7 @@ export default {
         title: this.transactionTitle,
         source: this.transactionSource,
         amount: amount,
+        currency: this.transactionCurrency,
         category: this.transactionCategory,
         email: user.email,
         year: date.getFullYear(),
@@ -228,6 +246,7 @@ export default {
         title: this.transactionTitle,
         source: this.transactionSource,
         amount: amount,
+        currency: this.transactionCurrency,
         email: user.email,
         year: date.getFullYear(),
         month: date.getUTCMonth() + 1,
@@ -267,8 +286,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#container {
+#popup-container {
   width: 30%;
-  min-width: 300px;
+  min-width: 400px;
 }
 </style>

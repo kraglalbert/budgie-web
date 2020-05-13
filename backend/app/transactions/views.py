@@ -147,6 +147,7 @@ def create_transaction():
     source = data.get("source")
     amount = int(data.get("amount"))
     email = data.get("email")
+    currency = data.get("currency")
     category_name = data.get("category")
 
     year = data.get("year")
@@ -161,6 +162,7 @@ def create_transaction():
         or year is None
         or month is None
         or day is None
+        or currency is None
     ):
         abort(400, "Cannot have empty fields for transaction")
 
@@ -201,6 +203,7 @@ def create_transaction():
         amount=amount,
         user_id=user.id,
         date=date,
+        currency=currency,
         category_id=category_id,
         transaction_month_id=t_month.id,
     )
@@ -218,6 +221,7 @@ def update_transaction(id):
     title = data.get("title")
     source = data.get("source")
     amount = int(data.get("amount"))
+    currency = data.get("currency")
 
     year = data.get("year")
     month = data.get("month")
@@ -246,6 +250,7 @@ def update_transaction(id):
     t.source = source
     t.amount = amount
     t.date = date
+    t.currency = currency
 
     db.session.add(t)
     db.session.commit()

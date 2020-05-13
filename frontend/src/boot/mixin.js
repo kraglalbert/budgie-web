@@ -3,6 +3,9 @@ import moment from "moment";
 
 Vue.mixin({
   methods: {
+    getSupportedCurrencies: function () {
+      return ["CAD", "USD"];
+    },
     getFormattedDate: function (date) {
       return moment(date).utc().format("MMMM Do, YYYY");
     },

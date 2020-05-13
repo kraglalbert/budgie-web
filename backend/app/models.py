@@ -91,6 +91,7 @@ class Transaction(db.Model):
     # amount in cents
     amount = db.Column(db.Integer, nullable=False)
     date = db.Column(db.Date, nullable=False)
+    currency = db.Column(db.String(3), nullable=False)  # 3-letter currency code
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     transaction_month_id = db.Column(
@@ -110,6 +111,7 @@ class Transaction(db.Model):
             "source": self.source,
             "amount": self.amount,
             "date": self.date,
+            "currency": self.currency,
             "category": category.name if category is not None else None,
             "user_id": self.user_id,
             "transaction_month_id": self.transaction_month_id,
