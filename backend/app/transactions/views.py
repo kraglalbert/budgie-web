@@ -210,7 +210,7 @@ def create_transaction():
 
     # get category object
     category_id = None
-    if category_name != "None":
+    if category_name.lower() != "none":
         category = Category.query.filter(
             Category.user_id == user.id, Category.name == category_name
         ).first()

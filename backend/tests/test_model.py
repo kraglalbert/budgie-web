@@ -17,9 +17,6 @@ class ModelTest(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
 
-    # def create_test_transactions(self):
-    #     # create 10 sample transactions
-
     # prefix all test cases with "test_"
     def test_create_user(self):
         user = User(
@@ -118,6 +115,7 @@ class ModelTest(unittest.TestCase):
             title="Groceries",
             source="Safeway",
             amount=10145,
+            currency="CAD",
             date=date,
             user_id=user.id,
             transaction_month_id=t_month.id,

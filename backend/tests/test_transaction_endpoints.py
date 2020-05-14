@@ -10,6 +10,8 @@ AMOUNT = -10045
 YEAR = 2019
 MONTH = 11
 DAY = 1
+CURRENCY = "CAD"
+CATEGORY = "None"
 
 
 class TransactionsIntegrationTest(unittest.TestCase):
@@ -41,6 +43,8 @@ class TransactionsIntegrationTest(unittest.TestCase):
                     "title": TITLE,
                     "source": SOURCE,
                     "amount": AMOUNT,
+                    "currency": CURRENCY,
+                    "category": CATEGORY,
                     "email": user.email,
                     "year": YEAR,
                     "month": MONTH,
@@ -74,7 +78,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
 
             # get all transactions for user ID
             resp = c.get(
-                "/transactions/user/{}".format(user.id),
+                "/transactions/user/{}?currency={}".format(user.id, CURRENCY),
                 headers={"Authorization": "Bearer {}".format(token)},
             )
             json_data = resp.get_json()
@@ -85,7 +89,9 @@ class TransactionsIntegrationTest(unittest.TestCase):
 
             # get transactions for user by date, valid
             resp = c.get(
-                "/transactions/user/{}?year=2019&month=11".format(user.id),
+                "/transactions/user/{}?year={}&month={}&currency={}".format(
+                    user.id, YEAR, MONTH, CURRENCY
+                ),
                 headers={"Authorization": "Bearer {}".format(token)},
             )
             json_data = resp.get_json()
@@ -96,7 +102,9 @@ class TransactionsIntegrationTest(unittest.TestCase):
 
             # get transactions for user by date, year only
             resp = c.get(
-                "/transactions/user/{}?year=2019".format(user.id),
+                "/transactions/user/{}?year={}&currency={}".format(
+                    user.id, YEAR, CURRENCY
+                ),
                 headers={"Authorization": "Bearer {}".format(token)},
             )
             json_data = resp.get_json()
@@ -107,7 +115,9 @@ class TransactionsIntegrationTest(unittest.TestCase):
 
             # get transactions for user by date, wrong date
             resp = c.get(
-                "/transactions/user/{}?year=2019&month=10".format(user.id),
+                "/transactions/user/{}?year={}&month={}&currency={}".format(
+                    user.id, YEAR, MONTH - 1, CURRENCY
+                ),
                 headers={"Authorization": "Bearer {}".format(token)},
             )
             json_data = resp.get_json()
@@ -115,7 +125,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
 
             # get transactions for user by date, bad format
             resp = c.get(
-                "/transactions/user/{}?month=10".format(user.id),
+                "/transactions/user/{}?month={}".format(user.id, MONTH),
                 headers={"Authorization": "Bearer {}".format(token)},
             )
             json_data = resp.get_json()
@@ -140,6 +150,8 @@ class TransactionsIntegrationTest(unittest.TestCase):
                     "source": SOURCE,
                     "amount": 1000,
                     "email": user.email,
+                    "currency": CURRENCY,
+                    "category": CATEGORY,
                     "year": 0,
                     "month": 0,
                     "day": 0,
@@ -156,6 +168,8 @@ class TransactionsIntegrationTest(unittest.TestCase):
                     "source": "",
                     "amount": 0,
                     "email": "",
+                    "currency": "",
+                    "category": "",
                     "year": YEAR,
                     "month": MONTH,
                     "day": DAY,
@@ -181,6 +195,8 @@ class TransactionsIntegrationTest(unittest.TestCase):
                     "title": TITLE,
                     "source": SOURCE,
                     "amount": AMOUNT,
+                    "currency": CURRENCY,
+                    "category": CATEGORY,
                     "email": user.email,
                     "year": YEAR,
                     "month": MONTH,
@@ -208,9 +224,6 @@ class TransactionsIntegrationTest(unittest.TestCase):
             self.assertEqual(json_data["title"], "New Car")
             self.assertEqual(json_data["source"], "Tesla")
             self.assertEqual(json_data["amount"], -5000000)
-            self.assertEqual(json_data["year"], 2020)
-            self.assertEqual(json_data["month"], 1)
-            self.assertEqual(json_data["day"], 31)
 
     def test_delete_transaction(self):
         user = User.generate_test_user()
@@ -229,6 +242,8 @@ class TransactionsIntegrationTest(unittest.TestCase):
                     "title": TITLE,
                     "source": SOURCE,
                     "amount": AMOUNT,
+                    "currency": CURRENCY,
+                    "category": CATEGORY,
                     "email": user.email,
                     "year": YEAR,
                     "month": MONTH,
