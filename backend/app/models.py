@@ -96,7 +96,7 @@ class Transaction(db.Model):
             "amount": self.amount,
             "date": self.date,
             "currency": self.currency,
-            "category": category.name if category is not None else None,
+            "category": category.name if category is not None else "None",
             "user_id": self.user_id,
             "transaction_month_id": self.transaction_month_id,
         }

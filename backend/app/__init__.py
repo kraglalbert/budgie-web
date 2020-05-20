@@ -16,11 +16,6 @@ jwt = JWTManager()
 def create_app(config_name):
     app = Flask(__name__)
 
-    app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-    app.config["JWT_COOKIE_SECURE"] = True if config_name == "production" else False
-    app.config["JWT_COOKIE_CSRF_PROTECT"] = True
-    app.config["JWT_SECRET_KEY"] = app.config["SECRET_KEY"]
-
     CORS(
         app,
         supports_credentials=True,
@@ -38,6 +33,12 @@ def create_app(config_name):
         config_name = os.getenv("FLASK_CONFIG") or "default"
 
     app.config.from_object(config[config_name])
+
+    app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+    app.config["JWT_COOKIE_SECURE"] = True if config_name == "production" else False
+    app.config["JWT_COOKIE_CSRF_PROTECT"] = False if config_name == "testing" else True
+    app.config["JWT_SECRET_KEY"] = app.config["SECRET_KEY"]
+
     config[config_name].init_app(app)
 
     # call init_app to complete initialization

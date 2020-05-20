@@ -25,6 +25,7 @@ class AuthIntegrationTest(unittest.TestCase):
                     "name": "John Doe",
                     "email": "jdoe@gmail.com",
                     "password": "secret",
+                    "default_currency": "CAD",
                 },
             )
             self.assertEqual(resp.status_code, 200)
@@ -34,14 +35,9 @@ class AuthIntegrationTest(unittest.TestCase):
                 "/auth/login", json={"email": "jdoe@gmail.com", "password": "secret"},
             )
             self.assertEqual(resp.status_code, 200)
-            json_data = resp.get_json()
-            token = json_data["token"]
 
             # get user by username
-            resp = c.get(
-                "/users/jdoe@gmail.com",
-                headers={"Authorization": "Bearer {}".format(token)},
-            )
+            resp = c.get("/users/jdoe@gmail.com")
             self.assertEqual(resp.status_code, 200)
 
             json_data = resp.get_json()
@@ -50,8 +46,44 @@ class AuthIntegrationTest(unittest.TestCase):
 
             # get user by ID
             user_id = json_data["id"]
-            resp = c.get(
-                "/users/{}".format(user_id),
-                headers={"Authorization": "Bearer {}".format(token)},
+            resp = c.get("/users/{}".format(user_id))
+            self.assertEqual(resp.status_code, 200)
+
+    def test_csrf(self):
+        self.app.config["JWT_COOKIE_CSRF_PROTECT"] = True
+        user = User.generate_test_user()
+
+        with self.app.test_client() as c:
+            resp = c.post(
+                "/auth/login", json={"email": user.email, "password": "password"},
             )
             self.assertEqual(resp.status_code, 200)
+
+            resp = c.post("/auth/logout")
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp.get_json(), {"msg": "Missing CSRF token"})
+
+            # get CSRF token and pass it as a header
+            csrf_access_token = ""
+            for cookie in c.cookie_jar:
+                if cookie.name == "csrf_access_token":
+                    csrf_access_token = cookie.value
+
+            resp = c.post("/auth/logout", headers={"X-CSRF-TOKEN": csrf_access_token})
+            self.assertEqual(resp.status_code, 200)
+
+    def test_non_matching_csrf_token(self):
+        self.app.config["JWT_COOKIE_CSRF_PROTECT"] = True
+        user = User.generate_test_user()
+
+        with self.app.test_client() as c:
+            resp = c.post(
+                "/auth/login", json={"email": user.email, "password": "password"},
+            )
+            self.assertEqual(resp.status_code, 200)
+
+            resp = c.post("/auth/logout", headers={"X-CSRF-TOKEN": "fake token"})
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(
+                resp.get_json(), {"msg": "CSRF double submit tokens do not match"}
+            )

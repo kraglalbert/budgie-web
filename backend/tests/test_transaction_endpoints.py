@@ -34,8 +34,6 @@ class TransactionsIntegrationTest(unittest.TestCase):
                 "/auth/login", json={"email": user.email, "password": "password"},
             )
             self.assertEqual(resp.status_code, 200)
-            json_data = resp.get_json()
-            token = json_data["token"]
 
             resp = c.post(
                 "/transactions",
@@ -50,16 +48,13 @@ class TransactionsIntegrationTest(unittest.TestCase):
                     "month": MONTH,
                     "day": DAY,
                 },
-                headers={"Authorization": "Bearer {}".format(token)},
             )
             self.assertEqual(resp.status_code, 200)
             json_data = resp.get_json()
             t_id = json_data["id"]
 
             # get all transactions
-            resp = c.get(
-                "/transactions", headers={"Authorization": "Bearer {}".format(token)}
-            )
+            resp = c.get("/transactions")
             json_data = resp.get_json()
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(len(json_data), 1)
@@ -67,20 +62,14 @@ class TransactionsIntegrationTest(unittest.TestCase):
             self.assertEqual(json_data[0]["source"], SOURCE)
 
             # get transaction by ID
-            resp = c.get(
-                "/transactions/{}".format(t_id),
-                headers={"Authorization": "Bearer {}".format(token)},
-            )
+            resp = c.get("/transactions/{}".format(t_id))
             json_data = resp.get_json()
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(json_data["amount"], AMOUNT)
             self.assertEqual(json_data["source"], SOURCE)
 
             # get all transactions for user ID
-            resp = c.get(
-                "/transactions/user/{}?currency={}".format(user.id, CURRENCY),
-                headers={"Authorization": "Bearer {}".format(token)},
-            )
+            resp = c.get("/transactions/user/{}?currency={}".format(user.id, CURRENCY))
             json_data = resp.get_json()
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(len(json_data), 1)
@@ -91,8 +80,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
             resp = c.get(
                 "/transactions/user/{}?year={}&month={}&currency={}".format(
                     user.id, YEAR, MONTH, CURRENCY
-                ),
-                headers={"Authorization": "Bearer {}".format(token)},
+                )
             )
             json_data = resp.get_json()
             self.assertEqual(resp.status_code, 200)
@@ -104,8 +92,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
             resp = c.get(
                 "/transactions/user/{}?year={}&currency={}".format(
                     user.id, YEAR, CURRENCY
-                ),
-                headers={"Authorization": "Bearer {}".format(token)},
+                )
             )
             json_data = resp.get_json()
             self.assertEqual(resp.status_code, 200)
@@ -117,17 +104,13 @@ class TransactionsIntegrationTest(unittest.TestCase):
             resp = c.get(
                 "/transactions/user/{}?year={}&month={}&currency={}".format(
                     user.id, YEAR, MONTH - 1, CURRENCY
-                ),
-                headers={"Authorization": "Bearer {}".format(token)},
+                )
             )
             json_data = resp.get_json()
             self.assertEqual(json_data, [])
 
             # get transactions for user by date, bad format
-            resp = c.get(
-                "/transactions/user/{}?month={}".format(user.id, MONTH),
-                headers={"Authorization": "Bearer {}".format(token)},
-            )
+            resp = c.get("/transactions/user/{}?month={}".format(user.id, MONTH))
             json_data = resp.get_json()
             self.assertEqual(resp.status_code, 400)
 
@@ -139,8 +122,6 @@ class TransactionsIntegrationTest(unittest.TestCase):
                 "/auth/login", json={"email": user.email, "password": "password"},
             )
             self.assertEqual(resp.status_code, 200)
-            json_data = resp.get_json()
-            token = json_data["token"]
 
             # create with invalid date
             resp = c.post(
@@ -156,7 +137,6 @@ class TransactionsIntegrationTest(unittest.TestCase):
                     "month": 0,
                     "day": 0,
                 },
-                headers={"Authorization": "Bearer {}".format(token)},
             )
             self.assertEqual(resp.status_code, 400)
 
@@ -174,7 +154,6 @@ class TransactionsIntegrationTest(unittest.TestCase):
                     "month": MONTH,
                     "day": DAY,
                 },
-                headers={"Authorization": "Bearer {}".format(token)},
             )
             self.assertEqual(resp.status_code, 400)
 
@@ -186,8 +165,6 @@ class TransactionsIntegrationTest(unittest.TestCase):
                 "/auth/login", json={"email": user.email, "password": "password"},
             )
             self.assertEqual(resp.status_code, 200)
-            json_data = resp.get_json()
-            token = json_data["token"]
 
             resp = c.post(
                 "/transactions",
@@ -202,7 +179,6 @@ class TransactionsIntegrationTest(unittest.TestCase):
                     "month": MONTH,
                     "day": DAY,
                 },
-                headers={"Authorization": "Bearer {}".format(token)},
             )
             self.assertEqual(resp.status_code, 200)
             json_data = resp.get_json()
@@ -214,11 +190,7 @@ class TransactionsIntegrationTest(unittest.TestCase):
             json_data["month"] = 1
             json_data["day"] = 31
 
-            resp = c.put(
-                "/transactions/{}".format(t_id),
-                json=json_data,
-                headers={"Authorization": "Bearer {}".format(token)},
-            )
+            resp = c.put("/transactions/{}".format(t_id), json=json_data)
             self.assertEqual(resp.status_code, 200)
             json_data = resp.get_json()
             self.assertEqual(json_data["title"], "New Car")
@@ -233,8 +205,11 @@ class TransactionsIntegrationTest(unittest.TestCase):
                 "/auth/login", json={"email": user.email, "password": "password"},
             )
             self.assertEqual(resp.status_code, 200)
-            json_data = resp.get_json()
-            token = json_data["token"]
+
+            csrf_access_token = ""
+            for cookie in c.cookie_jar:
+                if cookie.name == "csrf_access_token":
+                    csrf_access_token = cookie.value
 
             resp = c.post(
                 "/transactions",
@@ -249,22 +224,15 @@ class TransactionsIntegrationTest(unittest.TestCase):
                     "month": MONTH,
                     "day": DAY,
                 },
-                headers={"Authorization": "Bearer {}".format(token)},
             )
             self.assertEqual(resp.status_code, 200)
             json_data = resp.get_json()
             t_id = json_data["id"]
 
             # delete existing transaction
-            resp = c.delete(
-                "/transactions/{}".format(t_id),
-                headers={"Authorization": "Bearer {}".format(token)},
-            )
+            resp = c.delete("/transactions/{}".format(t_id),)
             self.assertEqual(resp.status_code, 200)
 
             # try deleting non-existent transaction
-            resp = c.delete(
-                "/transactions/{}".format(t_id),
-                headers={"Authorization": "Bearer {}".format(token)},
-            )
+            resp = c.delete("/transactions/{}".format(t_id),)
             self.assertEqual(resp.status_code, 404)

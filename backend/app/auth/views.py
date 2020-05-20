@@ -104,7 +104,7 @@ def register():
 
 
 # log out an existing user
-@auth.route("/logout")
+@auth.route("/logout", methods=["POST"])
 @jwt_required
 def logout():
     resp = jsonify("Logged out successfully")
