@@ -241,6 +241,7 @@ def update_transaction(id):
     source = data.get("source")
     amount = int(data.get("amount"))
     currency = data.get("currency")
+    category_name = data.get("category")
 
     year = data.get("year")
     month = data.get("month")
@@ -253,6 +254,8 @@ def update_transaction(id):
         or year is None
         or month is None
         or day is None
+        or currency is None
+        or category_name is None
     ):
         abort(400, "Cannot have empty fields for transaction")
 
@@ -265,11 +268,20 @@ def update_transaction(id):
     if t is None:
         abort(400, "No transaction found with specified ID")
 
+    # get category object
+    category_id = None
+    if category_name.lower() != "none":
+        category = Category.query.filter(
+            Category.user_id == t.user_id, Category.name == category_name
+        ).first()
+        category_id = category.id
+
     t.title = title
     t.source = source
     t.amount = amount
     t.date = date
     t.currency = currency
+    t.category_id = category_id
 
     db.session.add(t)
     db.session.commit()

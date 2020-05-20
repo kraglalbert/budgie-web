@@ -165,6 +165,9 @@ export default {
         this.transaction.amount
       ).replace(/-|\$/g, "");
       this.transactionAmount = amountFormatted;
+      this.transactionCategory = this.transaction.category
+        ? this.transaction.category
+        : "None";
 
       this.transactionCurrency = this.transaction.currency;
       this.transactionType =
@@ -247,6 +250,7 @@ export default {
         source: this.transactionSource,
         amount: amount,
         currency: this.transactionCurrency,
+        category: this.transactionCategory,
         email: user.email,
         year: date.getFullYear(),
         month: date.getUTCMonth() + 1,

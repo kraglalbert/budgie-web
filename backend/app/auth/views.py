@@ -55,20 +55,24 @@ def register():
     name: String
     email: String
     password: String
+    default_currency: String
     """
     data = request.get_json(force=True)
     name = data.get("name")
     email = data.get("email")
     password = data.get("password")
+    default_currency = data.get("default_currency")
 
-    if name == "" or email == "" or password == "":
+    if name is None or email is None or password is None or default_currency is None:
         abort(400, "Cannot have empty fields for user")
 
     user = User.query.filter_by(email=email).first()
     if user is not None:
         abort(400, "Account already exists with this email")
 
-    new_user = User(name=name, email=email, password=password)
+    new_user = User(
+        name=name, email=email, password=password, default_currency=default_currency
+    )
     db.session.add(new_user)
     db.session.commit()
     return jsonify(new_user.serialize)
