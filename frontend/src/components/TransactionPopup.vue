@@ -208,7 +208,7 @@ export default {
       this.$axios
         .post("/transactions", body, {
           headers: {
-            Authorization: `Bearer ${this.$store.state.token}`,
+            "X-CSRF-TOKEN": this.$q.cookies.get("csrf_access_token"),
           },
         })
         .then((_resp) => {
@@ -259,7 +259,7 @@ export default {
       this.$axios
         .put(`/transactions/${this.transaction.id}`, body, {
           headers: {
-            Authorization: `Bearer ${this.$store.state.token}`,
+            "X-CSRF-TOKEN": this.$q.cookies.get("csrf_access_token"),
           },
         })
         .then((_resp) => {

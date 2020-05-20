@@ -2,23 +2,36 @@ import os
 
 from flask import Flask
 from flask_cors import CORS
-from flask_httpauth import HTTPTokenAuth
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
+from flask_jwt_extended import JWTManager
 
 from config import config
 
 db = SQLAlchemy()
 migrate = Migrate()
-http_auth = HTTPTokenAuth("Bearer")
+jwt = JWTManager()
 
 
 def create_app(config_name):
     app = Flask(__name__)
+
+    app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+    app.config["JWT_COOKIE_SECURE"] = True if config_name == "production" else False
+    app.config["JWT_COOKIE_CSRF_PROTECT"] = True
+    app.config["JWT_SECRET_KEY"] = app.config["SECRET_KEY"]
+
     CORS(
         app,
+        supports_credentials=True,
         resources={
-            r"/*": {"origins": [r"http://localhost:*", r"http://192.168.0.11:*"]}
+            r"/*": {
+                "origins": [
+                    r"http://localhost:*",
+                    r"http://127.0.0.1:*",
+                    r"http://192.168.0.11:*",
+                ]
+            }
         },
     )
     if config_name is None:
@@ -30,6 +43,7 @@ def create_app(config_name):
     # call init_app to complete initialization
     db.init_app(app)
     migrate.init_app(app, db)
+    jwt.init_app(app)
 
     # create app blueprints
     from .main import main as main_blueprint

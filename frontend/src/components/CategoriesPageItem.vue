@@ -62,7 +62,7 @@ export default {
       this.$axios
         .delete(`/categories/${this.category.id}`, {
           headers: {
-            Authorization: `Bearer ${this.$store.state.token}`,
+            "X-CSRF-TOKEN": this.$q.cookies.get("csrf_access_token"),
           },
         })
         .then((_resp) => {

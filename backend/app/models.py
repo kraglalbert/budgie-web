@@ -1,6 +1,6 @@
 import json
 import base64
-from . import db, http_auth
+from . import db
 from flask import current_app
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import BadSignature, SignatureExpired
@@ -31,22 +31,6 @@ class User(db.Model):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
-
-    def generate_auth_token(self, expiration=86400):
-        s = Serializer(current_app.config["SECRET_KEY"], expiration)
-        return s.dumps({"token": self.id})
-
-    @staticmethod
-    @http_auth.verify_token
-    def verify_auth_token(token):
-        s = Serializer(current_app.config["SECRET_KEY"])
-        try:
-            data = s.loads(token)
-        except SignatureExpired:
-            return False  # valid token, but expired
-        except BadSignature:
-            return False  # invalid token
-        return User.query.get(data["token"])
 
     @staticmethod
     def generate_test_user():

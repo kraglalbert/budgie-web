@@ -3,12 +3,13 @@ from flask import Flask, jsonify, request, abort, make_response
 from sqlalchemy import extract
 from calendar import monthrange
 from . import transactions
-from .. import db, http_auth
+from .. import db
 from app.models import User, Transaction, TransactionMonth, Category
+from flask_jwt_extended import jwt_required
 
 # get all transactions
 @transactions.route("", methods=["GET"])
-@http_auth.login_required
+@jwt_required
 def get_transactions():
     transactions = Transaction.query.all()
     return jsonify(Transaction.serialize_list(transactions))
@@ -16,7 +17,7 @@ def get_transactions():
 
 # get transactions for user
 @transactions.route("/user/<int:user_id>", methods=["GET"])
-@http_auth.login_required
+@jwt_required
 def get_transactions_for_user(user_id):
     year = request.args.get("year")
     month = request.args.get("month")
@@ -66,7 +67,7 @@ def get_transactions_for_user(user_id):
 
 # get transaction months for user
 @transactions.route("/user/<int:user_id>/months", methods=["GET"])
-@http_auth.login_required
+@jwt_required
 def get_transaction_months_for_user(user_id):
     currency = request.args.get("currency")
 
@@ -104,7 +105,7 @@ def get_transaction_months_for_user(user_id):
 
 # get amount spent each day for specified month
 @transactions.route("/user/<int:user_id>/by-day", methods=["GET"])
-@http_auth.login_required
+@jwt_required
 def get_amount_by_day(user_id):
     year = int(request.args.get("year"))
     month = int(request.args.get("month"))
@@ -149,7 +150,7 @@ def get_amount_by_day(user_id):
 
 # get a transaction by ID
 @transactions.route("/<int:id>", methods=["GET"])
-@http_auth.login_required
+@jwt_required
 def get_transaction(id):
     t = Transaction.query.filter_by(id=id).first()
     if t is None:
@@ -159,7 +160,7 @@ def get_transaction(id):
 
 # create new transaction
 @transactions.route("", methods=["POST"])
-@http_auth.login_required
+@jwt_required
 def create_transaction():
     data = request.get_json(force=True)
     title = data.get("title")
@@ -234,7 +235,7 @@ def create_transaction():
 
 # update a transaction by ID
 @transactions.route("/<int:id>", methods=["PUT"])
-@http_auth.login_required
+@jwt_required
 def update_transaction(id):
     data = request.get_json(force=True)
     title = data.get("title")
@@ -291,7 +292,7 @@ def update_transaction(id):
 
 # delete a transaction by ID
 @transactions.route("/<int:id>", methods=["DELETE"])
-@http_auth.login_required
+@jwt_required
 def delete_transaction(id):
     t = Transaction.query.filter_by(id=id).first()
     if t is None:

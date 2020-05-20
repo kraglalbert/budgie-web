@@ -1,25 +1,28 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Vue from "vue";
+import VueRouter from "vue-router";
 
-import axios from 'axios'
-import routes from './routes'
-import Store from '../store'
+import axios from "axios";
+import routes from "./routes";
+import Store from "../store";
 
-Vue.use(VueRouter)
+import { Cookies } from "quasar";
 
-var config = require('../config')
+Vue.use(VueRouter);
+
+var config = require("../config");
 
 // Axios config
-const frontendUrl = config.build.host + ':' + config.build.port
-const backendUrl = config.build.backendHost + ':' + config.build.backendPort
+const frontendUrl = config.build.host + ":" + config.build.port;
+const backendUrl = config.build.backendHost + ":" + config.build.backendPort;
 
 var AXIOS = axios.create({
   baseURL: backendUrl,
   headers: {
-    'Access-Control-Allow-Origin': frontendUrl,
-    'Content-Type': 'application/json'
-  }
-})
+    "Access-Control-Allow-Origin": frontendUrl,
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
 
 /*
  * If not building with SSR mode, you can
@@ -35,43 +38,46 @@ export default function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     mode: process.env.VUE_ROUTER_MODE,
-    base: process.env.VUE_ROUTER_BASE
-  })
+    base: process.env.VUE_ROUTER_BASE,
+  });
 
   Router.beforeEach((to, from, next) => {
-    if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
       // this route requires auth, check if logged in
       // if not, redirect to login page.
       if (!Store.getters.isLoggedIn) {
         next({
-          path: '/login',
-          query: { redirect: to.fullPath }
-        })
+          path: "/login",
+          query: { redirect: to.fullPath },
+        });
       } else if (Store.getters.isLoggedIn && !Store.state.userExists) {
         // get user with stored token
-        const token = Store.state.token
-        AXIOS.post('/auth/token', { token: token })
-          .then(resp => {
-            Store.commit('set_user', resp.data)
-            next()
+        AXIOS.post("/auth/token/refresh", null, {
+          headers: {
+            "X-CSRF-TOKEN": Cookies.get("csrf_refresh_token"),
+          },
+        })
+          .then((resp) => {
+            Store.commit("set_user", resp.data.user);
+            next();
           })
           .catch(() => {
             // token is invalid
-            Store.dispatch('logout').then(
+            Store.dispatch("logout").then(
               next({
-                path: '/login',
-                query: { redirect: to.fullPath }
+                path: "/login",
+                query: { redirect: to.fullPath },
               })
-            )
-            next()
-          })
+            );
+            next();
+          });
       } else {
-        next()
+        next();
       }
     } else {
-      next() // always call next()
+      next(); // always call next()
     }
-  })
+  });
 
-  return Router
+  return Router;
 }

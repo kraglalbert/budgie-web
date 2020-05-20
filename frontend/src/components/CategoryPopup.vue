@@ -77,7 +77,7 @@ export default {
       this.$axios
         .post("/categories", body, {
           headers: {
-            Authorization: `Bearer ${this.$store.state.token}`,
+            "X-CSRF-TOKEN": this.$q.cookies.get("csrf_access_token"),
           },
         })
         .then((resp) => {
@@ -111,7 +111,7 @@ export default {
       this.$axios
         .put(`/categories/${this.category.id}`, body, {
           headers: {
-            Authorization: `Bearer ${this.$store.state.token}`,
+            "X-CSRF-TOKEN": this.$q.cookies.get("csrf_access_token"),
           },
         })
         .then((resp) => {

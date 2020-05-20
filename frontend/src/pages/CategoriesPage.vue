@@ -70,7 +70,7 @@ export default {
       this.$axios
         .get(`/categories/user/${userId}`, {
           headers: {
-            Authorization: `Bearer ${this.$store.state.token}`,
+            "X-CSRF-TOKEN": this.$q.cookies.get("csrf_access_token"),
           },
         })
         .then((resp) => {

@@ -66,7 +66,7 @@ export default {
       this.$axios
         .put(`/users/${userId}/settings`, body, {
           headers: {
-            Authorization: `Bearer ${this.$store.state.token}`,
+            "X-CSRF-TOKEN": this.$q.cookies.get("csrf_access_token"),
           },
         })
         .then((resp) => {

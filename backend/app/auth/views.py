@@ -1,8 +1,18 @@
 import datetime
 from flask import Flask, jsonify, request, abort, make_response
 from . import auth
-from .. import db, http_auth
+from .. import db
 from app.models import User, Transaction, TransactionMonth
+from flask_jwt_extended import (
+    jwt_required,
+    create_access_token,
+    jwt_refresh_token_required,
+    create_refresh_token,
+    get_jwt_identity,
+    set_access_cookies,
+    set_refresh_cookies,
+    unset_jwt_cookies,
+)
 
 # log in an existing user
 @auth.route("/login", methods=["POST"])
@@ -23,27 +33,33 @@ def login():
         and user.password_hash is not None
         and user.verify_password(password)
     ):
-        token = user.generate_auth_token()
-        return jsonify({"user": user.serialize, "token": token.decode("ascii")})
+        # create the tokens
+        access_token = create_access_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
+
+        resp = jsonify({"user": user.serialize})
+        set_access_cookies(resp, access_token)
+        set_refresh_cookies(resp, refresh_token)
+
+        return resp
     return "Wrong email or password!", 400
 
 
 # check if token is valid and return user
-@auth.route("/token", methods=["POST"])
-def verify_token():
-    """
-    Required in body:
+@auth.route("/token/refresh", methods=["POST"])
+@jwt_refresh_token_required
+def refresh_token():
+    # create the new access token
+    current_user_id = get_jwt_identity()
+    access_token = create_access_token(identity=current_user_id)
 
-    token: String
-    """
-    data = request.get_json(force=True)
-    token = data.get("token")
+    user = User.query.filter_by(id=current_user_id).first()
 
-    user = User.verify_auth_token(token)
-    if user is None:
-        abort(404, "Token does not match any user")
+    # set the JWT access cookie in the response
+    resp = jsonify({"user": user.serialize})
+    set_access_cookies(resp, access_token)
 
-    return jsonify(user.serialize)
+    return resp
 
 
 # register a new user
@@ -75,12 +91,22 @@ def register():
     )
     db.session.add(new_user)
     db.session.commit()
-    return jsonify(new_user.serialize)
+
+    # create the tokens
+    access_token = create_access_token(identity=new_user.id)
+    refresh_token = create_refresh_token(identity=new_user.id)
+
+    resp = jsonify({"user": new_user.serialize})
+    set_access_cookies(resp, access_token)
+    set_refresh_cookies(resp, refresh_token)
+
+    return resp
 
 
 # log out an existing user
 @auth.route("/logout")
-@http_auth.login_required
+@jwt_required
 def logout():
-    # TODO: maybe implement this?
-    return "Logged out successfully", 200
+    resp = jsonify("Logged out successfully")
+    unset_jwt_cookies(resp)
+    return resp

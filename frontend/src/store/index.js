@@ -18,6 +18,7 @@ var AXIOS = axios.create({
     "Access-Control-Allow-Origin": frontendUrl,
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 /*
@@ -33,7 +34,7 @@ const Store = new Vuex.Store({
     userExists: false,
   },
   getters: {
-    isLoggedIn: (state) => !!state.token,
+    isLoggedIn: (state) => !!state.currentUser,
     authStatus: (state) => state.status,
     userCurrency: (state) => state.currentUser.default_currency,
   },
@@ -43,7 +44,6 @@ const Store = new Vuex.Store({
     },
     auth_success(state, authObj) {
       state.status = "success";
-      state.token = authObj.token;
       state.currentUser = authObj.user;
       state.userExists = true;
     },
@@ -70,16 +70,13 @@ const Store = new Vuex.Store({
           password: user.password,
         })
           .then((resp) => {
-            const token = resp.data.token;
             const user = resp.data.user;
-            localStorage.setItem("token", token);
 
-            commit("auth_success", { token, user });
+            commit("auth_success", { user });
             resolve(resp);
           })
           .catch((err) => {
             commit("auth_error");
-            localStorage.removeItem("token");
             reject(err);
           });
       });
@@ -93,16 +90,13 @@ const Store = new Vuex.Store({
           password: user.password,
         })
           .then((resp) => {
-            const token = resp.data.token;
             const user = resp.data.user;
-            localStorage.setItem("token", token);
 
-            commit("auth_success", { token, user });
+            commit("auth_success", { user });
             resolve(resp);
           })
           .catch((err) => {
             commit("auth_error", err);
-            localStorage.removeItem("token");
             reject(err);
           });
       });
@@ -110,8 +104,6 @@ const Store = new Vuex.Store({
     logout({ commit }) {
       return new Promise((resolve, reject) => {
         commit("logout");
-        localStorage.removeItem("token");
-        delete axios.defaults.headers.common["Authorization"];
         resolve();
       });
     },

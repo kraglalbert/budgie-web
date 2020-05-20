@@ -3,12 +3,13 @@ import re
 from flask import Flask, jsonify, request, abort, make_response
 from sqlalchemy import extract
 from . import users
-from .. import db, http_auth
+from .. import db
 from app.models import User, Transaction, TransactionMonth
+from flask_jwt_extended import jwt_required
 
 # get all users
 @users.route("", methods=["GET"])
-@http_auth.login_required
+@jwt_required
 def get_all_users():
     users = User.query.all()
     return jsonify(User.serialize_list(users))
@@ -16,7 +17,7 @@ def get_all_users():
 
 # get user by ID
 @users.route("/<int:user_id>", methods=["GET"])
-@http_auth.login_required
+@jwt_required
 def get_user_by_id(user_id):
     user = User.query.filter_by(id=user_id).first()
     if user is None:
@@ -26,7 +27,7 @@ def get_user_by_id(user_id):
 
 # get user by email
 @users.route("/<email>", methods=["GET"])
-@http_auth.login_required
+@jwt_required
 def get_user_by_email(email):
     user = User.query.filter_by(email=email).first()
     if user is None:
@@ -36,7 +37,7 @@ def get_user_by_email(email):
 
 # update a user's settings (monthly budget, default currency)
 @users.route("/<int:user_id>/settings", methods=["PUT"])
-@http_auth.login_required
+@jwt_required
 def update_user_settings(user_id):
     data = request.get_json(force=True)
 

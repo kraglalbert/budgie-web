@@ -34,7 +34,7 @@ export default {
     this.$axios
       .get(`/transactions/user/${userId}/months`, {
         headers: {
-          Authorization: `Bearer ${this.$store.state.token}`,
+          "X-CSRF-TOKEN": this.$q.cookies.get("csrf_access_token"),
         },
         params: {
           currency: this.$store.getters.userCurrency,

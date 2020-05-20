@@ -1,11 +1,12 @@
 from flask import Flask, jsonify, request, abort, make_response
 from . import categories
-from .. import db, http_auth
+from .. import db
 from app.models import Category
+from flask_jwt_extended import jwt_required
 
 # get all categories for user
 @categories.route("/user/<int:user_id>", methods=["GET"])
-@http_auth.login_required
+@jwt_required
 def get_categories_for_user(user_id):
     categories = Category.query.filter_by(user_id=user_id).all()
     return jsonify(Category.serialize_list(categories))
@@ -13,7 +14,7 @@ def get_categories_for_user(user_id):
 
 # create new category
 @categories.route("", methods=["POST"])
-@http_auth.login_required
+@jwt_required
 def create_category():
     body = request.get_json(force=True)
     name = body.get("name")
@@ -28,7 +29,7 @@ def create_category():
 
 # update existing category
 @categories.route("/<int:id>", methods=["PUT"])
-@http_auth.login_required
+@jwt_required
 def update_category(id):
     body = request.get_json(force=True)
     name = body.get("name")
@@ -49,7 +50,7 @@ def update_category(id):
 
 # delete existing category
 @categories.route("/<int:id>", methods=["DELETE"])
-@http_auth.login_required
+@jwt_required
 def delete_category(id):
     category = Category.query.filter_by(id=id).first()
     if category is None:
