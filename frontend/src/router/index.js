@@ -45,13 +45,8 @@ export default function (/* { store, ssrContext } */) {
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       // this route requires auth, check if logged in
       // if not, redirect to login page.
-      if (!Store.getters.isLoggedIn) {
-        next({
-          path: "/login",
-          query: { redirect: to.fullPath },
-        });
-      } else if (Store.getters.isLoggedIn && !Store.state.userExists) {
-        // get user with stored token
+      if (!Store.getters.userExists) {
+        // try to get user with stored cookies
         AXIOS.post("/auth/token/refresh", null, {
           headers: {
             "X-CSRF-TOKEN": Cookies.get("csrf_refresh_token"),
@@ -62,7 +57,7 @@ export default function (/* { store, ssrContext } */) {
             next();
           })
           .catch(() => {
-            // token is invalid
+            // token is invalid or user not logged in
             Store.dispatch("logout").then(
               next({
                 path: "/login",

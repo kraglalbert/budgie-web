@@ -29,12 +29,10 @@ var AXIOS = axios.create({
 const Store = new Vuex.Store({
   state: {
     status: "",
-    token: localStorage.getItem("token") || "",
-    currentUser: {},
-    userExists: false,
+    currentUser: null,
   },
   getters: {
-    isLoggedIn: (state) => !!state.currentUser,
+    userExists: (state) => state.currentUser !== null,
     authStatus: (state) => state.status,
     userCurrency: (state) => state.currentUser.default_currency,
   },
@@ -53,7 +51,7 @@ const Store = new Vuex.Store({
     logout(state) {
       state.status = "";
       state.token = "";
-      state.currentUser = {};
+      state.currentUser = null;
       state.userExists = false;
     },
     set_user(state, user) {
