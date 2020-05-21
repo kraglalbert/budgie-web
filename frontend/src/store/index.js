@@ -2,6 +2,8 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
 
+import { Cookies } from "quasar";
+
 // import example from './module-example'
 
 Vue.use(Vuex);
@@ -101,8 +103,20 @@ const Store = new Vuex.Store({
     },
     logout({ commit }) {
       return new Promise((resolve, reject) => {
-        commit("logout");
-        resolve();
+        AXIOS.post("/auth/logout", null, {
+          headers: {
+            "X-CSRF-TOKEN": Cookies.get("csrf_access_token"),
+          },
+        })
+          .then((resp) => {
+            const user = resp.data.user;
+
+            commit("logout");
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
       });
     },
   },
