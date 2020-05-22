@@ -16,7 +16,7 @@ def get_all_users():
 
 
 # get user by ID
-@users.route("/<int:user_id>", methods=["GET"])
+@users.route("/id/<int:user_id>", methods=["GET"])
 @jwt_required
 def get_user_by_id(user_id):
     user = User.query.filter_by(id=user_id).first()
@@ -26,7 +26,7 @@ def get_user_by_id(user_id):
 
 
 # get user by email
-@users.route("/<email>", methods=["GET"])
+@users.route("/email/<email>", methods=["GET"])
 @jwt_required
 def get_user_by_email(email):
     user = User.query.filter_by(email=email).first()
@@ -50,6 +50,11 @@ def update_user_settings(user_id):
     except TypeError:
         monthly_budget = None
 
+    try:
+        monthly_budget_from_net = bool(data.get("monthly_budget_from_net"))
+    except TypeError:
+        monthly_budget_from_net = None
+
     default_currency = data.get("default_currency")
 
     if monthly_budget is None and default_currency is None:
@@ -60,6 +65,9 @@ def update_user_settings(user_id):
             abort(400, "Monthly budget cannot be negative")
 
         user.monthly_budget = monthly_budget
+
+    if monthly_budget_from_net is not None:
+        user.monthly_budget_from_net = monthly_budget_from_net
 
     if default_currency is not None:
         if len(default_currency) != 3 or re.match("[A-Z]{3}", default_currency) is None:

@@ -14,15 +14,21 @@
 
     <q-card-section v-else>
       <div class="space text">
+        Net:
+        <span style="float: right;">
+          {{ netAmount }}
+        </span>
+      </div>
+      <div class="space text">
         Spent:
         <span style="float: right;">
-          {{ amountSpent }}
+          {{ amountSpentString }}
         </span>
       </div>
       <div class="space text">
         Earned:
         <span style="float: right;">
-          {{ amountEarned }}
+          {{ amountEarnedString }}
         </span>
       </div>
       <div class="space text">
@@ -68,7 +74,10 @@ export default {
           spent += Math.abs(t.amount);
         }
       });
-      return this.getFormattedDollarAmount(spent);
+      return spent;
+    },
+    amountSpentString: function () {
+      return this.getFormattedDollarAmount(this.amountSpent);
     },
     amountEarned: function () {
       var earned = 0;
@@ -77,13 +86,22 @@ export default {
           earned += t.amount;
         }
       });
-      return this.getFormattedDollarAmount(earned);
+      return earned;
+    },
+    amountEarnedString: function () {
+      return this.getFormattedDollarAmount(this.amountEarned);
+    },
+    netAmount: function () {
+      return this.getFormattedDollarAmount(
+        this.amountEarned - this.amountSpent
+      );
     },
     remainingBudget: function () {
-      const user = this.$store.state.currentUser;
-      return user.monthly_budget === 0
-        ? "N/A"
-        : this.getFormattedDollarAmount(user.user_budget - this.amountSpent);
+      const budgetRemaining = this.getRemainingBudget(
+        this.amountEarned,
+        this.amountSpent
+      );
+      return this.getFormattedDollarAmount(budgetRemaining);
     },
   },
   methods: {

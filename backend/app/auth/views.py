@@ -103,6 +103,29 @@ def register():
     return resp
 
 
+# change password for existing user
+@auth.route("/change-password", methods=["POST"])
+@jwt_required
+def change_password():
+    """
+    Required in body:
+
+    old_password: String
+    new_password: String
+    """
+    data = request.get_json(force=True)
+    old_password = data.get("old_password")
+    new_password = data.get("new_password")
+
+    user_id = get_jwt_identity()
+    user = User.query.filter_by(id=user_id).first()
+
+    if user.change_password(old_password, new_password):
+        return "Password changed successfully", 200
+    else:
+        return "Failed to change password", 400
+
+
 # log out an existing user
 @auth.route("/logout", methods=["POST"])
 @jwt_required

@@ -14,6 +14,7 @@ class User(db.Model):
     email = db.Column(db.String(64), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     monthly_budget = db.Column(db.Integer)  # amount in cents
+    monthly_budget_from_net = db.Column(db.Boolean)
     default_currency = db.Column(db.String(3))  # 3-letter currency code
     categories = db.relationship("Category", backref="users", lazy=True)
     transactions = db.relationship("Transaction", backref="users", lazy=True)
@@ -32,6 +33,14 @@ class User(db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def change_password(self, old_password, new_password):
+        if not self.verify_password(old_password):
+            return False
+        self.password = new_password
+        db.session.add(self)
+        db.session.commit()
+        return True
+
     @staticmethod
     def generate_test_user():
         user = User(name="Albert Kragl", email="akragl@gmail.com", password="password")
@@ -49,6 +58,7 @@ class User(db.Model):
             "monthly_budget": self.monthly_budget
             if self.monthly_budget is not None
             else 0,
+            "monthly_budget_from_net": self.monthly_budget_from_net,
             "default_currency": self.default_currency
             if self.default_currency is not None
             else "",

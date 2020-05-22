@@ -1,6 +1,8 @@
 import Vue from "vue";
 import moment from "moment";
 
+import Store from "../store";
+
 Vue.mixin({
   methods: {
     getSupportedCurrencies: function () {
@@ -16,6 +18,19 @@ Vue.mixin({
       } else {
         dollarAmount = dollarAmount * -1;
         return "-$" + dollarAmount.toFixed(2);
+      }
+    },
+    getRemainingBudget: function (earned, spent) {
+      const user = Store.state.currentUser;
+      if (!user.monthly_budget) {
+        return 0;
+      } else {
+        if (user.monthly_budget_from_net) {
+          const net = spent - earned;
+          return user.monthly_budget - net;
+        } else {
+          return user.monthly_budget - spent;
+        }
       }
     },
     compareTransactionDates: function (t1, t2) {

@@ -22,7 +22,7 @@
                 </q-item-section>
               </q-item>
               <q-separator />
-              <q-item clickable v-close-popup>
+              <q-item clickable v-close-popup @click="goToSettingsPage">
                 <q-item-section>Settings</q-item-section>
               </q-item>
               <q-separator />
@@ -66,6 +66,9 @@ export default {
     refreshUser: function () {
       this.showCurrencyPopup = false;
       this.selectedCurrency = this.$store.getters.userCurrency;
+    },
+    goToSettingsPage: function () {
+      this.$router.push({ path: "settings" });
     },
     logout: function () {
       this.$store.dispatch("logout").then(this.$router.push({ path: "login" }));
