@@ -24,26 +24,22 @@ AXIOS.interceptors.response.use(
     return response;
   },
   function (error) {
-    if (Store.getters.isLoggedIn) {
-      if (error.response.status === 401) {
-        // get user with stored token
-        AXIOS.post("/auth/token/refresh", null, {
-          headers: {
-            "X-CSRF-TOKEN": Cookies.get("csrf_refresh_token"),
-          },
+    if (error.response.status === 401) {
+      // get user with stored token
+      AXIOS.post("/auth/token/refresh", null, {
+        headers: {
+          "X-CSRF-TOKEN": Cookies.get("csrf_refresh_token"),
+        },
+      })
+        .then((resp) => {
+          Store.commit("set_user", resp.data.user);
         })
-          .then((resp) => {
-            Store.commit("set_user", resp.data.user);
-          })
-          .catch(() => {
-            // token is invalid
-            Store.dispatch("logout").then(Router.push({ path: "/login" }));
-          });
-      } else {
-        Router.push({ path: "/login" });
-      }
+        .catch(() => {
+          // token is invalid
+          Store.dispatch("logout").then(Router.push({ path: "/login" }));
+        });
     } else {
-      return Promise.reject(error);
+      Router.push({ path: "/login" });
     }
   }
 );
