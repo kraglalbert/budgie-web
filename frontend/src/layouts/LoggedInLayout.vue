@@ -1,10 +1,19 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh Lpr lff">
     <q-header elevated>
       <q-toolbar>
-        <q-toolbar-title
-          ><router-link to="/home">budgie</router-link></q-toolbar-title
-        >
+        <q-btn
+          flat
+          dense
+          round
+          @click="leftDrawerOpen = !leftDrawerOpen"
+          icon="menu"
+          aria-label="Menu"
+        />
+
+        <q-toolbar-title>
+          <router-link to="/home">budgie</router-link>
+        </q-toolbar-title>
 
         <div style="padding-right: 10px;">
           {{ $store.state.currentUser.name }}
@@ -35,6 +44,36 @@
       </q-toolbar>
     </q-header>
 
+    <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      :mini="miniState"
+      @mouseover="miniState = false"
+      @mouseout="miniState = true"
+      bordered
+    >
+      <q-list>
+        <SidebarLink
+          title="Transactions"
+          caption="View all transactions"
+          link="/transactions/all"
+          icon="local_atm"
+        />
+        <SidebarLink
+          title="Categories"
+          caption="Manage your transaction categories"
+          link="/categories"
+          icon="category"
+        />
+        <SidebarLink
+          title="Export CSV"
+          caption="Export transaction data to CSV"
+          link="/home"
+          icon="playlist_add_check"
+        />
+      </q-list>
+    </q-drawer>
+
     <q-dialog v-model="showCurrencyPopup">
       <CurrencyPopup
         :currency="selectedCurrency"
@@ -50,16 +89,20 @@
 
 <script>
 import CurrencyPopup from "../components/CurrencyPopup";
+import SidebarLink from "../components/SidebarLink";
 
 export default {
   name: "LoggedInLayout",
   components: {
     CurrencyPopup,
+    SidebarLink,
   },
   data: function () {
     return {
       selectedCurrency: this.$store.getters.userCurrency,
       showCurrencyPopup: false,
+      leftDrawerOpen: false,
+      miniState: true,
     };
   },
   methods: {
