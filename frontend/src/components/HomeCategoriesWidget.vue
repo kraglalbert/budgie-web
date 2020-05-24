@@ -12,7 +12,7 @@
       </div>
       <div v-else>
         <div v-for="category in categories" :key="category.id">
-          <q-chip>{{ category.name }}</q-chip>
+          <q-chip outline>{{ category.name }}</q-chip>
         </div>
 
         <div class="row justify-center q-mt-xs">

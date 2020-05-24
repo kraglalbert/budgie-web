@@ -1,7 +1,7 @@
 <template>
   <div class="row q-pl-md q-mb-sm">
     <div class="col">
-      <q-chip>{{ category.name }}</q-chip>
+      <q-chip outline>{{ category.name }}</q-chip>
     </div>
     <div class="col">
       <div class="float-right">

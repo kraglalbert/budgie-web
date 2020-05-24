@@ -127,10 +127,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#container:hover {
-  background-color: $highlight;
-}
-
 #remove-button {
   color: $negative;
 }

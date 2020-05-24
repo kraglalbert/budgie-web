@@ -30,11 +30,32 @@
                   </div>
                 </q-item-section>
               </q-item>
+
               <q-separator />
+
+              <q-item>
+                <q-item-section>
+                  <q-item-label>Dark Mode</q-item-label>
+                </q-item-section>
+                <q-item-section side class="float-right">
+                  <q-toggle
+                    color="white"
+                    dense
+                    v-model="darkModeOn"
+                    val="picture"
+                    @input="setDarkMode"
+                  />
+                </q-item-section>
+              </q-item>
+
+              <q-separator />
+
               <q-item clickable v-close-popup @click="goToSettingsPage">
                 <q-item-section>Settings</q-item-section>
               </q-item>
+
               <q-separator />
+
               <q-item clickable v-close-popup @click="logout">
                 <q-item-section>Log Out</q-item-section>
               </q-item>
@@ -103,9 +124,19 @@ export default {
       showCurrencyPopup: false,
       leftDrawerOpen: false,
       miniState: true,
+      darkModeOn: this.$q.localStorage.getItem("darkMode"),
     };
   },
+  created: function () {
+    this.setDarkMode();
+  },
   methods: {
+    setDarkMode: function () {
+      if (this.darkModeOn === null) this.darkModeOn = false;
+
+      this.$q.dark.set(this.darkModeOn);
+      this.$q.localStorage.set("darkMode", this.darkModeOn);
+    },
     refreshUser: function () {
       this.showCurrencyPopup = false;
       this.selectedCurrency = this.$store.getters.userCurrency;
