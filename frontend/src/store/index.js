@@ -36,7 +36,7 @@ const Store = new Vuex.Store({
   getters: {
     userExists: (state) => state.currentUser !== null,
     authStatus: (state) => state.status,
-    userCurrency: (state) => state.currentUser.default_currency,
+    userCurrency: (state) => state.currentUser.selected_currency,
   },
   mutations: {
     auth_request(state) {

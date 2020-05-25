@@ -59,7 +59,7 @@ export default {
     updateCurrency: function () {
       this.submitting = true;
       const body = {
-        default_currency: this.selectedCurrency,
+        selected_currency: this.selectedCurrency,
       };
       const userId = this.$store.state.currentUser.id;
 

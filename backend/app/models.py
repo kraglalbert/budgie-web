@@ -15,7 +15,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(128))
     monthly_budget = db.Column(db.Integer)  # amount in cents
     monthly_budget_from_net = db.Column(db.Boolean)
-    default_currency = db.Column(db.String(3))  # 3-letter currency code
+    selected_currency = db.Column(db.String(3))  # 3-letter currency code
+    primary_currency = db.Column(db.String(3))  # 3-letter currency code
     categories = db.relationship("Category", backref="users", lazy=True)
     transactions = db.relationship("Transaction", backref="users", lazy=True)
     transactions_months = db.relationship(
@@ -59,9 +60,8 @@ class User(db.Model):
             if self.monthly_budget is not None
             else 0,
             "monthly_budget_from_net": self.monthly_budget_from_net,
-            "default_currency": self.default_currency
-            if self.default_currency is not None
-            else "",
+            "selected_currency": self.selected_currency,
+            "primary_currency": self.primary_currency,
             "transactions": Transaction.serialize_list(self.transactions),
             "email": self.email,
         }

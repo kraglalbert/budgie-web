@@ -55,10 +55,15 @@ def update_user_settings(user_id):
     except TypeError:
         monthly_budget_from_net = None
 
-    default_currency = data.get("default_currency")
+    selected_currency = data.get("selected_currency")
+    primary_currency = data.get("primary_currency")
 
-    if monthly_budget is None and default_currency is None:
-        abort(400, "Must give values for monthly budget or default currency")
+    if (
+        monthly_budget is None
+        and selected_currency is None
+        and primary_currency is None
+    ):
+        abort(400, "No values given to update")
 
     if monthly_budget is not None:
         if monthly_budget < 0:
@@ -69,11 +74,20 @@ def update_user_settings(user_id):
     if monthly_budget_from_net is not None:
         user.monthly_budget_from_net = monthly_budget_from_net
 
-    if default_currency is not None:
-        if len(default_currency) != 3 or re.match("[A-Z]{3}", default_currency) is None:
-            abort(400, "Default currency must be in 3-letter currency code format")
+    if selected_currency is not None:
+        if (
+            len(selected_currency) != 3
+            or re.match("[A-Z]{3}", selected_currency) is None
+        ):
+            abort(400, "Selected currency must be in 3-letter currency code format")
 
-        user.default_currency = default_currency
+        user.selected_currency = selected_currency
+
+    if primary_currency is not None:
+        if len(primary_currency) != 3 or re.match("[A-Z]{3}", primary_currency) is None:
+            abort(400, "Primary currency must be in 3-letter currency code format")
+
+        user.primary_currency = primary_currency
 
     db.session.add(user)
     db.session.commit()

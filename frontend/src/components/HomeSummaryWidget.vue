@@ -97,6 +97,13 @@ export default {
       );
     },
     remainingBudget: function () {
+      const user = this.$store.state.currentUser;
+
+      if (user.selected_currency != user.primary_currency) {
+        // budget applies only to primary currency
+        return "N/A";
+      }
+
       const budgetRemaining = this.getRemainingBudget(
         this.amountEarned,
         this.amountSpent
