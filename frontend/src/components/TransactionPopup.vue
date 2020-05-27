@@ -186,7 +186,8 @@ export default {
       this.submitting = true;
 
       const user = this.$store.state.currentUser;
-      let amount = parseFloat(this.transactionAmount) * 100;
+      // use the round function to convert to int
+      let amount = Math.round(parseFloat(this.transactionAmount) * 100);
       if (this.transactionType === "spending") {
         amount = -1 * amount;
       }
@@ -238,7 +239,8 @@ export default {
       this.submitting = true;
 
       const user = this.$store.state.currentUser;
-      let amount = parseFloat(this.transactionAmount) * 100;
+      // use the round function to convert to int
+      let amount = Math.round(parseFloat(this.transactionAmount) * 100);
       if (this.transactionType === "spending") {
         amount = -1 * amount;
       }
