@@ -38,8 +38,8 @@
     <q-form @submit="updateBudget">
       <q-input
         filled
+        dense
         v-model="budget"
-        label="Monthly Budget"
         mask="#.##"
         fill-mask="0"
         reverse-fill-mask

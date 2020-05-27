@@ -25,12 +25,11 @@
 
             <q-tab-panels v-model="tab" animated>
               <q-tab-panel name="login">
-                <q-form @submit="onLogIn" class="q-gutter-md">
+                <q-form @submit="onLogIn" class="q-gutter-xs">
                   <q-input
                     filled
                     v-model="email"
                     label="Email"
-                    hint="Enter your email"
                     lazy-rules
                     :rules="[
                       (val) =>
@@ -43,7 +42,6 @@
                     v-model="password"
                     label="Password"
                     type="password"
-                    hint="Enter your password"
                     lazy-rules
                     :rules="[
                       (val) =>

@@ -59,7 +59,7 @@
               filled
               class="col-4"
               v-model="transactionCurrency"
-              hint="Currency"
+              label="Currency"
               :options="getSupportedCurrencies()"
             />
           </div>
@@ -79,7 +79,13 @@
           ]"
         />
 
-        <q-input filled v-model="transactionDate" mask="date" :rules="['date']">
+        <q-input
+          filled
+          v-model="transactionDate"
+          mask="date"
+          label="Date"
+          :rules="['date']"
+        >
           <template v-slot:append>
             <q-icon name="event" class="cursor-pointer">
               <q-popup-proxy
