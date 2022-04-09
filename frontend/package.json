@@ -19,7 +19,7 @@
     "axios": "^0.18.1",
     "eslint-config-prettier": "^6.11.0",
     "minimist": "^1.2.5",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "prettier": "^2.0.5",
     "quasar": "^1.10.0",
     "vuex-persistedstate": "^2.7.0"
