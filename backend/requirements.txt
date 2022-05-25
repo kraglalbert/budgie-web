@@ -32,7 +32,7 @@ parse-type==0.5.2
 pep8==1.7.1
 psycopg2-binary==2.8.3
 pycodestyle==2.5.0
-PyJWT==1.7.1
+PyJWT==2.4.0
 pylint==2.3.1
 pylint-flask==0.6
 pylint-plugin-utils==0.5
